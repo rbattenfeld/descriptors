@@ -2,6 +2,7 @@ package org.jboss.shrinkwrap.descriptor.test.portedfrompoc;
 
 import org.jboss.shrinkwrap.descriptor.api.Descriptors;
 import org.jboss.shrinkwrap.descriptor.api.persistence20.PersistenceDescriptor;
+import org.jboss.shrinkwrap.descriptor.impl.FactoryImpl;
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -60,8 +61,8 @@ public class PersistenceDescriptorEclipseLinkTestCase {
     }
 
     private PersistenceDescriptor create() {
-        return Descriptors.create(PersistenceDescriptor.class).getOrCreatePersistenceUnit()
-            .name(this.getClass().getSimpleName()).up();
+        return Descriptors.create(PersistenceDescriptor.class).addPersistenceUnit(FactoryImpl.instance().persistenceUnitPersistence20()
+            .name(this.getClass().getSimpleName()));
     }
 
 }

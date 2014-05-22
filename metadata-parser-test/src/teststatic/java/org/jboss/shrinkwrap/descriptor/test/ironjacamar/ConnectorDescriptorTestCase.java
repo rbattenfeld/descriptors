@@ -23,6 +23,7 @@ import junit.framework.Assert;
 
 import org.jboss.shrinkwrap.descriptor.api.Descriptors;
 import org.jboss.shrinkwrap.descriptor.api.connector10.ConnectorDescriptor;
+import org.jboss.shrinkwrap.descriptor.impl.FactoryImpl;
 import org.jboss.shrinkwrap.descriptor.test.util.XmlAssert;
 import org.junit.Test;
 
@@ -50,26 +51,24 @@ public class ConnectorDescriptorTestCase
       	.specVersion("1.0")
       	.eisType("Sample")
       	.version("1.0")
-      	.getOrCreateLicense()
+      	.license(FactoryImpl.instance().licenseConnector10()
       		.description("description0")
-      		.licenseRequired("true")
-      		.up()
-      	.getOrCreateResourceadapter()
+      		.licenseRequired("true"))
+      	.resourceadapter(FactoryImpl.instance().resourceadapterConnector10()
       		.managedconnectionfactoryClass("org.jboss.messaging.adapters.jcasample.SampleManagedConnectionFactory")
       		.connectionfactoryInterface("javax.resource.cci.ConnectionFactory")
       		.connectionfactoryImplClass("org.jboss.messaging.adapters.jcasample.SampleConnectionFactory")
       		.connectionInterface("javax.resource.cci.Connection")
       		.connectionImplClass("org.jboss.messaging.adapters.jcasample.SampleConnection")
       		.transactionSupport("NoTransaction")
-      		.createConfigProperty()
+      		.addConfigProperty(FactoryImpl.instance().configPropertyConnector10()
       			.configPropertyName("Input")
       			.configPropertyType("java.lang.String")
-      			.configPropertyValue("test messages").up()
-      		.createAuthenticationMechanism()
+      			.configPropertyValue("test messages"))
+      		.addAuthenticationMechanism(FactoryImpl.instance().authenticationMechanismConnector10()
       			.authenticationMechanismType("BasicPassword")
-      			.credentialInterface("javax.resource.security.PasswordCredential").up()
-      		.reauthenticationSupport("false")
-      	.up();
+      			.credentialInterface("javax.resource.security.PasswordCredential"))
+      		.reauthenticationSupport("false"));
       	        
        String generatedRaXml = jca10Generated.exportAsString();
        String originalRaXml = this.getResourceContents("src/test/resources/test-orig-connector10.xml");

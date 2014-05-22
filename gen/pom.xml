@@ -493,7 +493,8 @@
 										<property><name>xmlns:xsi</name><value>http://www.w3.org/2001/XMLSchema-instance</value></property>
 										<property><name>xsi:schemaLocation</name><value>http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-facelettaglibrary_2_0.xsd</value></property>
 									</namespaces>
-									<common>
+									<generateCommonClasses>false</generateCommonClasses>
+								<!--	<common>
 										<id>facelettaglibrary20</id>
 										<generate>true</generate>
 										<pathToCommonApi>${basedir}/../api-javaee/src/main/java</pathToCommonApi>
@@ -503,7 +504,7 @@
 											<type>javaee:facelet-taglib-tagType:unbounded:tag</type>
 											<type>javaee:facelet-taglib-functionType:unbounded:function</type>
 										</types>
-									</common>
+									</common>-->
 								</descriptor>
 
 								<descriptor>
@@ -1347,7 +1348,8 @@
 										<property><name>xmlns:xsi</name><value>http://www.w3.org/2001/XMLSchema-instance</value></property>
 										<property><name>xsi:schemaLocation</name><value>http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-facelettaglibrary_2_2.xsd</value></property>
 									</namespaces>
-									<common>
+									<generateCommonClasses>false</generateCommonClasses>
+									<!--<common>
 										<id>facelettaglibrary22</id>
 										<generate>false</generate>
 										<pathToCommonApi>${basedir}/../api-javaee/src/main/java</pathToCommonApi>
@@ -1357,7 +1359,7 @@
 											<type>javaee:facelet-taglib-tagType:unbounded:tag</type>
 											<type>javaee:facelet-taglib-functionType:unbounded:function</type>
 										</types>
-									</common>
+									</common>-->
 								</descriptor>
 								
 								<descriptor>
@@ -1534,6 +1536,7 @@
 						<phase>validate</phase>
 						<configuration>
 							<verbose>false</verbose>
+							<generatedFactory>true</generatedFactory> <!-- must be last execution in order to include all generated classes -->
 							<javadocs>
 								<javadoc>
 									<tag>@author</tag>

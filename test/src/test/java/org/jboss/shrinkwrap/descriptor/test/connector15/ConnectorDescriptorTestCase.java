@@ -23,6 +23,7 @@ import junit.framework.Assert;
 
 import org.jboss.shrinkwrap.descriptor.api.Descriptors;
 import org.jboss.shrinkwrap.descriptor.api.connector15.ConnectorDescriptor;
+import org.jboss.shrinkwrap.descriptor.impl.FactoryImpl;
 import org.jboss.shrinkwrap.descriptor.test.util.XmlAssert;
 import org.junit.Test;
 
@@ -52,7 +53,7 @@ public class ConnectorDescriptorTestCase {
          .vendorName("Red Hat Middleware LLC")
          .eisType("JMS 1.1 Server")
          .resourceadapterVersion("1.0")
-         .getOrCreateLicense()
+         .license(FactoryImpl.instance().licenseTypeConnector15()
             .description("Copyright 2009 Red Hat, Inc. " +
  "Red Hat licenses this file to you under the Apache License, version " +
  "2.0 (the \"License\"); you may not use this file except in compliance " +
@@ -63,61 +64,59 @@ public class ConnectorDescriptorTestCase {
  "WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or " +
  "implied.  See the License for the specific language governing " +
  "permissions and limitations under the License.")
-            .licenseRequired(true).up()
-         .getOrCreateResourceadapter()
+            .licenseRequired(true))
+         .resourceadapter(FactoryImpl.instance().resourceadapterTypeConnector15()
             .resourceadapterClass("org.hornetq.ra.HornetQResourceAdapter")
-            .createConfigProperty()
+            .addConfigProperty(FactoryImpl.instance().configPropertyTypeConnector15()
                .description("The transport type. Multiple connectors can be configured by using a comma separated list, "+
                   "i.e. org.hornetq.core.remoting.impl.invm.InVMConnectorFactory,org.hornetq.core.remoting.impl.invm.InVMConnectorFactory.")
                .configPropertyName("ConnectorClassName")
                .configPropertyType("java.lang.String")
-               .configPropertyValue("org.hornetq.core.remoting.impl.invm.InVMConnectorFactory").up()
-            .createConfigProperty()
+               .configPropertyValue("org.hornetq.core.remoting.impl.invm.InVMConnectorFactory"))
+            .addConfigProperty(FactoryImpl.instance().configPropertyTypeConnector15()
                .description("The transport configuration. These values must be in the form of key=val;key=val;, "+
                      "if multiple connectors are used then each set must be separated by a comma i.e. host=host1;port=5445,host=host2;port=5446. "+
                      "Each set of params maps to the connector classname specified.")
                .configPropertyName("ConnectionParameters")
                .configPropertyType("java.lang.String")
-               .configPropertyValue("server-id=0").up()
-            .getOrCreateOutboundResourceadapter()
-               .createConnectionDefinition()
+               .configPropertyValue("server-id=0"))
+            .outboundResourceadapter(FactoryImpl.instance().outboundResourceadapterTypeConnector15()
+               .addConnectionDefinition(FactoryImpl.instance().connectionDefinitionTypeConnector15()
                   .managedconnectionfactoryClass("org.hornetq.ra.HornetQRAManagedConnectionFactory")
-                  .createConfigProperty()
+                  .addConfigProperty(FactoryImpl.instance().configPropertyTypeConnector15()
                      .description("The default session type")
                      .configPropertyName("SessionDefaultType")
                      .configPropertyType("java.lang.String")
-                     .configPropertyValue("javax.jms.Queue").up()
-                  .createConfigProperty()
+                     .configPropertyValue("javax.jms.Queue"))
+                  .addConfigProperty(FactoryImpl.instance().configPropertyTypeConnector15()
                      .description("Try to obtain a lock within specified number of seconds; less than or equal to 0 disable this functionality")
                      .configPropertyName("UseTryLock")
                      .configPropertyType("java.lang.Integer")
-                     .configPropertyValue("0").up()
+                     .configPropertyValue("0"))
                   .connectionfactoryInterface("org.hornetq.ra.HornetQRAConnectionFactory")
                   .connectionfactoryImplClass("org.hornetq.ra.HornetQRAConnectionFactoryImpl")
                   .connectionInterface("javax.jms.Session")
-                  .connectionImplClass("org.hornetq.ra.HornetQRASession")
-                  .up()
+                  .connectionImplClass("org.hornetq.ra.HornetQRASession"))
               .transactionSupport("XATransaction")
-              .createAuthenticationMechanism()
+              .addAuthenticationMechanism(FactoryImpl.instance().authenticationMechanismTypeConnector15()
                  .authenticationMechanismType("BasicPassword")
-                 .credentialInterface("javax.resource.spi.security.PasswordCredential")
-                 .up()
-              .reauthenticationSupport(false)
-              .up()
-           .getOrCreateInboundResourceadapter()
-              .getOrCreateMessageadapter()
-                 .createMessagelistener()
+                 .credentialInterface("javax.resource.spi.security.PasswordCredential"))
+              .reauthenticationSupport(false))
+           .inboundResourceadapter(FactoryImpl.instance().inboundResourceadapterTypeConnector15()
+              .messageadapter(FactoryImpl.instance().messageadapterTypeConnector15()
+                 .addMessagelistener(FactoryImpl.instance().messagelistenerTypeConnector15()
                     .messagelistenerType("javax.jms.MessageListener")
-                    .getOrCreateActivationspec()
+                    .activationspec(FactoryImpl.instance().activationspecTypeConnector15()
                        .activationspecClass("org.hornetq.ra.inflow.HornetQActivationSpec")
-                       .createRequiredConfigProperty()
-                          .configPropertyName("destination").up()
-                    .up()
-                 .up()
-              .up()
-           .up()
-       .up();
-
+                       .addRequiredConfigProperty(FactoryImpl.instance().requiredConfigPropertyTypeConnector15()
+                          .configPropertyName("destination")
+                       )
+                    )
+                 )
+              )
+           )
+        );
+   
         String generatedRaXml = jca15Generated.exportAsString();
         String hornetQRaXml = this.getResourceContents("src/test/resources/test-orig-connector15.xml");
 

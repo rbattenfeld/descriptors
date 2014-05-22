@@ -23,7 +23,7 @@ public class MetadataParserTest {
 		final MetadataParser parser = new MetadataParser();
 		boolean isRuntimeExceptionThrown = false;
 		try {
-			parser.parse(null, null, null, false);
+			parser.parse(null, null, null, false, false);
 		}
 		catch(IllegalArgumentException ex) {
 			isRuntimeExceptionThrown = true;
@@ -37,7 +37,7 @@ public class MetadataParserTest {
 		final MetadataParser parser = new MetadataParser();
 		boolean isRuntimeExceptionThrown = false;
 		try {
-			parser.parse(null, new ArrayList<MetadataParserConfiguration>(), null, false);
+			parser.parse(null, new ArrayList<MetadataParserConfiguration>(), null, false, false);
 		}
 		catch(IllegalArgumentException ex) {
 			isRuntimeExceptionThrown = true;
@@ -51,7 +51,7 @@ public class MetadataParserTest {
 		final MetadataParser parser = new MetadataParser();
 		boolean isRuntimeExceptionThrown = false;
 		try {
-			parser.parse(new MetadataParserPath(), null, null, false);
+			parser.parse(new MetadataParserPath(), null, null, false, false);
 		}
 		catch(IllegalArgumentException ex) {
 			isRuntimeExceptionThrown = true;
@@ -108,7 +108,7 @@ public class MetadataParserTest {
 //		javadocList.add(javadoc2);
 		
 		final MetadataParser parser = new MetadataParser();
-		parser.parse(path, confList, null, true);
+		parser.parse(path, confList, null, true, false);
 		
 		final String pathToMetadata = parser.getPathToMetadataFile();
 		Assert.assertNotNull(pathToMetadata);

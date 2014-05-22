@@ -16,15 +16,14 @@
  */
 package org.jboss.shrinkwrap.descriptor.test.connector10;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertEquals;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
 
-import junit.framework.Assert;
-
 import org.jboss.shrinkwrap.descriptor.api.Descriptors;
 import org.jboss.shrinkwrap.descriptor.api.connector10.ConnectorDescriptor;
+import org.jboss.shrinkwrap.descriptor.impl.FactoryImpl;
 import org.jboss.shrinkwrap.descriptor.test.util.XmlAssert;
 import org.junit.Test;
 
@@ -36,49 +35,44 @@ public class ConnectorDescriptorTestCase {
 
     @Test
     public void testDefaultName() throws Exception {
-        Assert.assertEquals("ra.xml", create().getDescriptorName());
+        assertEquals("ra.xml", create().getDescriptorName());
     }
 
     @Test
     public void testSetName() throws Exception {
-        Assert.assertEquals("test.xml", Descriptors.create(ConnectorDescriptor.class, "test.xml").getDescriptorName());
+        assertEquals("test.xml", Descriptors.create(ConnectorDescriptor.class, "test.xml").getDescriptorName());
     }
 
     @Test
-    public void testHornetQExample() throws Exception {
-        ConnectorDescriptor jca10Generated = create()
+    public void testHornetQExample() throws Exception {    	
+        final ConnectorDescriptor jca10Generated = create()
             .displayName("Sample Adapter")
             .description("It is a sample resource adapter")
             .vendorName("JBoss")
             .specVersion("1.0")
             .eisType("Sample")
             .version("1.0")
-            .getOrCreateLicense()
-                .description("description0")
-                .licenseRequired("true")
-                .up()
-            .getOrCreateResourceadapter()
-                .managedconnectionfactoryClass("org.jboss.messaging.adapters.jcasample.SampleManagedConnectionFactory")
+            .license(FactoryImpl.instance().licenseConnector10()
+            	.description("description0")
+            	.licenseRequired("true"))
+            .resourceadapter(FactoryImpl.instance().resourceadapterConnector10()
+        		.managedconnectionfactoryClass("org.jboss.messaging.adapters.jcasample.SampleManagedConnectionFactory")
                 .connectionfactoryInterface("javax.resource.cci.ConnectionFactory")
                 .connectionfactoryImplClass("org.jboss.messaging.adapters.jcasample.SampleConnectionFactory")
                 .connectionInterface("javax.resource.cci.Connection")
                 .connectionImplClass("org.jboss.messaging.adapters.jcasample.SampleConnection")
                 .transactionSupport("NoTransaction")
-                .createConfigProperty()
-                    .configPropertyName("Input")
+                .addConfigProperty(FactoryImpl.instance().configPropertyConnector10()
+                	.configPropertyName("Input")
                     .configPropertyType("java.lang.String")
-                    .configPropertyValue("test messages").up()
-                .createAuthenticationMechanism()
-                    .authenticationMechanismType("BasicPassword")
-                    .credentialInterface("javax.resource.security.PasswordCredential").up()
-                .reauthenticationSupport("false")
-            .up();
-
-        String generatedRaXml = jca10Generated.exportAsString();
-        String originalRaXml = this.getResourceContents("src/test/resources/test-orig-connector10.xml");
-
-        // System.out.println(generatedRaXml);
-
+                    .configPropertyValue("test messages"))
+                .addAuthenticationMechanism(FactoryImpl.instance().authenticationMechanismConnector10()
+                	.authenticationMechanismType("BasicPassword")
+                    .credentialInterface("javax.resource.security.PasswordCredential"))
+                .reauthenticationSupport("false"));
+        
+        final String generatedRaXml = jca10Generated.exportAsString();
+        final String originalRaXml = this.getResourceContents("src/test/resources/test-orig-connector10.xml");
         XmlAssert.assertIdentical(originalRaXml, generatedRaXml);
     }
 

@@ -78,7 +78,7 @@ public class MetadataParser {
      */
     @SuppressWarnings("unchecked")
     public void parse(final MetadataParserPath path, final List<?> confList, final List<?> javadocTags,
-        final boolean verbose) throws Exception {
+        final boolean verbose, final boolean generatedFactory) throws Exception {
         checkArguments(path, confList);
 
         pathToMetadata = createTempFile(verbose);
@@ -164,6 +164,10 @@ public class MetadataParser {
         if (path.getPathToApi() != null && path.getPathToImpl() != null) {
             generateCode(path, verbose);
             PackageInfo.copyPackageInfo(path, metadata, verbose);
+        }
+
+        if (generatedFactory) {
+            new MetadataFactoryBuilder().createFactory(path.pathToApi, path.pathToImpl);
         }
     }
 

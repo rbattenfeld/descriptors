@@ -62,11 +62,18 @@ public class MetadataParserMojo extends AbstractMojo {
      */
     protected boolean verbose;
 
+    /**
+     * Factory flag.
+     *
+     * @parameter
+     */
+    protected boolean generatedFactory;
+
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
         try {
             final MetadataParser metadataParser = new MetadataParser();
-            metadataParser.parse(path, descriptors, javadocs, verbose);
+            metadataParser.parse(path, descriptors, javadocs, verbose, generatedFactory);
         } catch (final Throwable t) {
             throw new MojoFailureException(t.getMessage(), t);
         }

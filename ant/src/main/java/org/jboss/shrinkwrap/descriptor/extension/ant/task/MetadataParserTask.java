@@ -33,8 +33,12 @@ import java.util.Properties;
  * @author <a href="mailto:jesper.pedersen@jboss.org">Jesper Pedersen</a>
  */
 public class MetadataParserTask extends Task {
+
     /** Trace flag */
     protected boolean verbose;
+
+    /** Factory flag */
+    protected boolean generatedFactory;
 
     /** Classpath ref */
     protected String classpathRef;
@@ -56,11 +60,22 @@ public class MetadataParserTask extends Task {
      */
     public MetadataParserTask() {
         this.verbose = false;
+        this.generatedFactory = false;
         this.classpathRef = null;
         this.path = null;
         this.descriptors = null;
         this.javadocs = null;
         this.classpath = null;
+    }
+
+    /**
+     * Set the generatedFactory flag
+     *
+     * @param v
+     *            The value
+     */
+    public void setGeneratedFactory(boolean v) {
+        generatedFactory = v;
     }
 
     /**
@@ -170,7 +185,7 @@ public class MetadataParserTask extends Task {
             }
 
             final MetadataParser metadataParser = new MetadataParser();
-            metadataParser.parse(path, data, javadoc, verbose);
+            metadataParser.parse(path, data, javadoc, verbose, generatedFactory);
         } catch (Throwable t) {
             throw new BuildException(t.getMessage(), t);
         } finally {

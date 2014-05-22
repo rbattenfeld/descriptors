@@ -16,6 +16,8 @@
  */
 package org.jboss.shrinkwrap.descriptor.test.connector16;
 
+import static org.junit.Assert.assertEquals;
+
 import java.io.BufferedReader;
 import java.io.FileReader;
 
@@ -23,6 +25,7 @@ import junit.framework.Assert;
 
 import org.jboss.shrinkwrap.descriptor.api.Descriptors;
 import org.jboss.shrinkwrap.descriptor.api.connector16.ConnectorDescriptor;
+import org.jboss.shrinkwrap.descriptor.impl.FactoryImpl;
 import org.jboss.shrinkwrap.descriptor.test.util.XmlAssert;
 import org.junit.Test;
 
@@ -34,12 +37,12 @@ public class ConnectorDescriptorTestCase {
 
     @Test
     public void testDefaultName() throws Exception {
-        Assert.assertEquals("ra.xml", create().getDescriptorName());
+        assertEquals("ra.xml", create().getDescriptorName());
     }
 
     @Test
     public void testSetName() throws Exception {
-        Assert.assertEquals("test.xml", Descriptors.create(ConnectorDescriptor.class, "test.xml").getDescriptorName());
+        assertEquals("test.xml", Descriptors.create(ConnectorDescriptor.class, "test.xml").getDescriptorName());
     }
 
     @Test
@@ -50,66 +53,66 @@ public class ConnectorDescriptorTestCase {
          .moduleName("module-name0")
          .description("description0")
          .displayName("display-name0")
-         .getOrCreateIcon()
+         .addIcon(FactoryImpl.instance().iconTypeJavaee6()
             .smallIcon("small-icon0")
-            .largeIcon("large-icon0").up()
+            .largeIcon("large-icon0"))
          .vendorName("vendor-name0")
          .eisType("eis-type0")
          .resourceadapterVersion("resourceadapter-version0")
-         .getOrCreateLicense()
+         .license(FactoryImpl.instance().licenseTypeConnector16()
             .description("description1")
-            .licenseRequired(false).up()
-         .getOrCreateResourceadapter()
+            .licenseRequired(false))
+         .resourceadapter(FactoryImpl.instance().resourceadapterTypeConnector16()
             .resourceadapterClass("resourceadapter-class0")
-            .createConfigProperty()
+            .addConfigProperty(FactoryImpl.instance().configPropertyTypeConnector16()
                .description("description2")
                .configPropertyName("config-property-name0")
                .configPropertyType("java.lang.Boolean")
                .configPropertyValue("config-property-value0")
                .configPropertyIgnore(false)
                .configPropertySupportsDynamicUpdates(false)
-               .configPropertyConfidential(false).up()
-            .getOrCreateOutboundResourceadapter()
-               .createConnectionDefinition()
+               .configPropertyConfidential(false))
+            .outboundResourceadapter(FactoryImpl.instance().outboundResourceadapterTypeConnector16()
+               .addConnectionDefinition(FactoryImpl.instance().connectionDefinitionTypeConnector16()
                   .managedconnectionfactoryClass("managedconnectionfactory-class0")
-                  .createConfigProperty()
+                  .addConfigProperty(FactoryImpl.instance().configPropertyTypeConnector16()
                      .description("description3")
                      .configPropertyName("config-property-name1")
                      .configPropertyType("java.lang.Boolean")
                      .configPropertyValue("config-property-value1")
                      .configPropertyIgnore(false)
                      .configPropertySupportsDynamicUpdates(false)
-                     .configPropertyConfidential(false).up()
+                     .configPropertyConfidential(false))
                   .connectionfactoryInterface("connectionfactory-interface0")
                   .connectionfactoryImplClass("connectionfactory-impl-class0")
                   .connectionInterface("connection-interface0")
-                  .connectionImplClass("connection-impl-class0").up()
+                  .connectionImplClass("connection-impl-class0"))
                .transactionSupport("NoTransaction")
-               .createAuthenticationMechanism()
+               .addAuthenticationMechanism(FactoryImpl.instance().authenticationMechanismTypeConnector16()
                   .description("description4")
                   .authenticationMechanismType("authentication-mechanism-type0")
-                  .credentialInterface("javax.resource.spi.security.PasswordCredential").up()
-               .reauthenticationSupport(false).up()
-            .getOrCreateInboundResourceadapter()
-               .getOrCreateMessageadapter()
-                  .createMessagelistener()
+                  .credentialInterface("javax.resource.spi.security.PasswordCredential"))
+               .reauthenticationSupport(false))
+            .inboundResourceadapter(FactoryImpl.instance().inboundResourceadapterTypeConnector16()
+               .messageadapter(FactoryImpl.instance().messageadapterTypeConnector16()
+                  .addMessagelistener(FactoryImpl.instance().messagelistenerTypeConnector16()
                      .messagelistenerType("messagelistener-type0")
-                     .getOrCreateActivationspec()
-                        .activationspecClass("activationspec-class0").up().up().up().up()
-            .createAdminobject()
+                     .activationspec(FactoryImpl.instance().activationspecTypeConnector16()
+                        .activationspecClass("activationspec-class0")))))
+            .addAdminobject(FactoryImpl.instance().adminobjectTypeConnector16()
                .adminobjectInterface("adminobject-interface0")
                .adminobjectClass("adminobject-class0")
-               .createConfigProperty()
+               .addConfigProperty(FactoryImpl.instance().configPropertyTypeConnector16()
                   .description("description5")
                   .configPropertyName("config-property-name2")
                   .configPropertyType("java.lang.Boolean")
                   .configPropertyValue("config-property-value2")
                   .configPropertyIgnore(false)
                   .configPropertySupportsDynamicUpdates(false)
-                  .configPropertyConfidential(false).up().up()
-            .createSecurityPermission()
+                  .configPropertyConfidential(false)))
+            .addSecurityPermission(FactoryImpl.instance().securityPermissionTypeConnector16()
                .description("description6")
-               .securityPermissionSpec("security-permission-spec0").up().up()
+               .securityPermissionSpec("security-permission-spec0")))
         .requiredWorkContext("required-work-context0");
 
         String createdRaXml = jca16Descr.exportAsString();

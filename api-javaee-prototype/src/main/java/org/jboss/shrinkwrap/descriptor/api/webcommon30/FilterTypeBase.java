@@ -18,8 +18,6 @@ package org.jboss.shrinkwrap.descriptor.api.webcommon30;
 
 import java.util.List;
 
-import org.jboss.shrinkwrap.descriptor.api.Child;
-
 /**
  * Base support for read-only views of the "web-app/filter" element. Not intended for direct use by users; instead use
  * {@link FilterType}.
@@ -34,8 +32,7 @@ import org.jboss.shrinkwrap.descriptor.api.Child;
  * TODO: Note changed interface signature to accommodate covarient return TODO: Note additional documentation above for
  * generic types
  */
-public interface FilterTypeBase<RETURNTYPE extends FilterTypeBase<RETURNTYPE, PARENTTYPE>, PARENTTYPE> extends
-    Child<PARENTTYPE> {
+public interface FilterTypeBase<RETURNTYPE extends FilterTypeBase<RETURNTYPE, PARENTTYPE>, PARENTTYPE> {
 
     /*
      * TODO:

@@ -48,10 +48,10 @@ abstract class FilterTypeImplBase<FILTERTYPE extends FilterTypeBase<FILTERTYPE, 
      * 
      * @see org.jboss.shrinkwrap.descriptor.api.Child#up()
      */
-    @Override
-    public final WEBAPPDESCRIPTORTYPE up() {
-        return parent;
-    }
+//    @Override
+//    public final WEBAPPDESCRIPTORTYPE up() {
+//        return parent;
+//    }
 
     /**
      * Returns all <code>description</code> elements
