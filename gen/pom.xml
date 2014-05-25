@@ -112,6 +112,7 @@
 						<phase>validate</phase>
 						<configuration>
 							<verbose>false</verbose>
+							<factoryContext>JavaEE</factoryContext>
 							<javadocs>
 								<javadoc>
 									<tag>@author</tag>
@@ -153,6 +154,7 @@
 						<phase>validate</phase>
 						<configuration>
 							<verbose>false</verbose>
+							<factoryContext>JavaEE</factoryContext>
 							<javadocs>
 								<javadoc>
 									<tag>@author</tag>
@@ -280,6 +282,7 @@
 						<phase>validate</phase>
 						<configuration>
 							<verbose>false</verbose>
+							<factoryContext>JavaEE</factoryContext>
 							<javadocs>
 								<javadoc>
 									<tag>@author</tag>
@@ -636,6 +639,7 @@
 						<phase>validate</phase>
 						<configuration>
 							<verbose>false</verbose>
+							<factoryContext>JavaEE</factoryContext>
 							<javadocs>
 								<javadoc>
 									<tag>@author</tag>
@@ -980,6 +984,7 @@
 						<phase>validate</phase>
 						<configuration>
 							<verbose>false</verbose>
+							<factoryContext>JavaEE</factoryContext>
 							<javadocs>
 								<javadoc>
 									<tag>@author</tag>
@@ -1452,6 +1457,7 @@
 						<phase>validate</phase>
 						<configuration>
 							<verbose>false</verbose>
+							<factoryContext>JavaEE</factoryContext>
 							<javadocs>
 								<javadoc>
 									<tag>@author</tag>
@@ -1536,7 +1542,8 @@
 						<phase>validate</phase>
 						<configuration>
 							<verbose>false</verbose>
-							<generatedFactory>true</generatedFactory> <!-- must be last execution in order to include all generated classes -->
+							<factoryContext>JavaEE</factoryContext>
+							<generateFactory>true</generateFactory> <!-- must be last execution in order to include all generated classes -->
 							<javadocs>
 								<javadoc>
 									<tag>@author</tag>
@@ -1620,6 +1627,7 @@
 						<phase>validate</phase>
 						<configuration>
 							<verbose>false</verbose>
+							<factoryContext>JBossEE</factoryContext>
 							<javadocs>
 								<javadoc>
 									<tag>@author</tag>
@@ -1697,6 +1705,8 @@
 						<phase>validate</phase>
 						<configuration>
 							<verbose>false</verbose>
+							<factoryContext>JBossEE</factoryContext>
+							<generateFactory>true</generateFactory> <!-- must be last execution in order to include all generated classes -->
 							<javadocs>
 								<javadoc>
 									<tag>@author</tag>
@@ -1780,6 +1790,8 @@
 						<phase>validate</phase>
 						<configuration>
 							<verbose>false</verbose>
+							<factoryContext>Misc</factoryContext>
+							<generateFactory>true</generateFactory> <!-- must be last execution in order to include all generated classes -->
 							<javadocs>
 								<javadoc>
 									<tag>@author</tag>

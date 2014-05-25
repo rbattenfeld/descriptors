@@ -59,6 +59,8 @@
                         <phase>validate</phase>
                         <configuration>
                             <verbose>false</verbose>
+<!--                            <factoryContext>Ironjacamar</factoryContext>-->
+<!--                            <generatedFactory>true</generatedFactory>-->
                             <path>
                                 <pathToApi>${basedir}/src/main/java</pathToApi>
                                 <pathToImpl>${basedir}/src/main/java</pathToImpl>

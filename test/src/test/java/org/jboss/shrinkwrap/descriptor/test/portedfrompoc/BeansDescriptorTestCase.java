@@ -30,7 +30,7 @@ import junit.framework.Assert;
 
 import org.jboss.shrinkwrap.descriptor.api.Descriptors;
 import org.jboss.shrinkwrap.descriptor.api.beans10.BeansDescriptor;
-import org.jboss.shrinkwrap.descriptor.impl.FactoryImpl;
+import org.jboss.shrinkwrap.descriptor.impl.FactoryJavaEEImpl;
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -89,7 +89,7 @@ public class BeansDescriptorTestCase {
             + "http://java.sun.com/xml/ns/javaee/beans_1_0.xsd";
 
         // when
-        final String descriptorXml = create().alternatives(FactoryImpl.instance().alternativesBeans10()
+        final String descriptorXml = create().alternatives(FactoryJavaEEImpl.instance().alternativesBeans10()
             .stereotype(TestAlternativeStereoType.class.getName())).exportAsString();
 
         // then
@@ -105,12 +105,12 @@ public class BeansDescriptorTestCase {
     @Ignore
     @Test(expected = IllegalArgumentException.class)
     public void shouldNotBeAbleToAddNonAlternativeStereoType() {
-        create().alternatives(FactoryImpl.instance().alternativesBeans10().clazz(Override.class.getName()));
+        create().alternatives(FactoryJavaEEImpl.instance().alternativesBeans10().clazz(Override.class.getName()));
     }
 
     @Test
     public void shouldBeAbleToAddAlternativeStereoType() throws Exception {
-        final String desc = create().alternatives(FactoryImpl.instance().alternativesBeans10().stereotype(TestAlternativeStereoType.class.getName())
+        final String desc = create().alternatives(FactoryJavaEEImpl.instance().alternativesBeans10().stereotype(TestAlternativeStereoType.class.getName())
             ).exportAsString();
         log.info(desc);
 
@@ -119,7 +119,7 @@ public class BeansDescriptorTestCase {
 
     @Test
     public void shouldBeAbleToAddAlternativeStereoTypes() throws Exception {
-        final String desc = create().alternatives(FactoryImpl.instance().alternativesBeans10()
+        final String desc = create().alternatives(FactoryJavaEEImpl.instance().alternativesBeans10()
             .stereotype(TestAlternativeStereoType.class.getName(), TestAlternativeStereoType.class.getName()))
             .exportAsString();
         log.info(desc);
@@ -136,12 +136,12 @@ public class BeansDescriptorTestCase {
     @Ignore
     @Test(expected = IllegalArgumentException.class)
     public void shouldNotBeAbleToAddNonAlternativeClass() {
-        create().alternatives(FactoryImpl.instance().alternativesBeans10().clazz(String.class.getName()));
+        create().alternatives(FactoryJavaEEImpl.instance().alternativesBeans10().clazz(String.class.getName()));
     }
 
     @Test
     public void shouldBeAbleToAddAlternativeClass() throws Exception {
-        final String desc = create().alternatives(FactoryImpl.instance().alternativesBeans10().clazz(TestAlternativeClass.class.getName()))
+        final String desc = create().alternatives(FactoryJavaEEImpl.instance().alternativesBeans10().clazz(TestAlternativeClass.class.getName()))
             .exportAsString();
 
         assertPresenceUsingXPath(desc, "/beans/alternatives/class", TestAlternativeClass.class.getName());
@@ -149,7 +149,7 @@ public class BeansDescriptorTestCase {
 
     @Test
     public void shouldBeAbleToAddAlternativeClasses() throws Exception {
-        final String desc = create().alternatives(FactoryImpl.instance().alternativesBeans10()
+        final String desc = create().alternatives(FactoryJavaEEImpl.instance().alternativesBeans10()
             .clazz(TestAlternativeClass.class.getName(), TestAlternativeClass.class.getName())).exportAsString();
         assertPresenceUsingXPath(desc, "/beans/alternatives/class", TestAlternativeClass.class.getName(),
             TestAlternativeClass.class.getName());
@@ -164,12 +164,12 @@ public class BeansDescriptorTestCase {
     @Ignore
     @Test(expected = IllegalArgumentException.class)
     public void shouldNotBeAbleToAddNonInterceptor() throws Exception {
-        create().interceptors(FactoryImpl.instance().interceptorsBeans10().clazz(String.class.getName()));
+        create().interceptors(FactoryJavaEEImpl.instance().interceptorsBeans10().clazz(String.class.getName()));
     }
 
     @Test
     public void shouldBeAbleToAddInterceptor() throws Exception {
-        final String desc = create().interceptors(FactoryImpl.instance().interceptorsBeans10().clazz(TestInterceptor.class.getName()))
+        final String desc = create().interceptors(FactoryJavaEEImpl.instance().interceptorsBeans10().clazz(TestInterceptor.class.getName()))
             .exportAsString();
 
         assertPresenceUsingXPath(desc, "/beans/interceptors/class", TestInterceptor.class.getName());
@@ -177,7 +177,7 @@ public class BeansDescriptorTestCase {
 
     @Test
     public void shouldBeAbleToAddInterceptors() throws Exception {
-        final String desc = create().interceptors(FactoryImpl.instance().interceptorsBeans10()
+        final String desc = create().interceptors(FactoryJavaEEImpl.instance().interceptorsBeans10()
             .clazz(TestInterceptor.class.getName(), TestInterceptor.class.getName())).exportAsString();
         assertPresenceUsingXPath(desc, "/beans/interceptors/class", TestInterceptor.class.getName(),
             TestInterceptor.class.getName());
@@ -192,18 +192,18 @@ public class BeansDescriptorTestCase {
     @Ignore
     @Test(expected = IllegalArgumentException.class)
     public void shouldNotBeAbleToAddNonDecorator() throws Exception {
-        create().decorators(FactoryImpl.instance().decoratorsBeans10().clazz(String.class.getName()));
+        create().decorators(FactoryJavaEEImpl.instance().decoratorsBeans10().clazz(String.class.getName()));
     }
 
     @Test
     public void shouldBeAbleToAddDescorator() throws Exception {
-        String desc = create().decorators(FactoryImpl.instance().decoratorsBeans10().clazz(TestDecorator.class.getName())).exportAsString();
+        String desc = create().decorators(FactoryJavaEEImpl.instance().decoratorsBeans10().clazz(TestDecorator.class.getName())).exportAsString();
         assertPresenceUsingXPath(desc, "/beans/decorators/class", TestDecorator.class.getName());
     }
 
     @Test
     public void shouldBeAbleToAddDescorators() throws Exception {
-        final String desc = create().decorators(FactoryImpl.instance().decoratorsBeans10()
+        final String desc = create().decorators(FactoryJavaEEImpl.instance().decoratorsBeans10()
             .clazz(TestDecorator.class.getName(), TestDecorator.class.getName())).exportAsString();
         assertPresenceUsingXPath(desc, "/beans/decorators/class", TestDecorator.class.getName(),
             TestDecorator.class.getName());
@@ -215,7 +215,7 @@ public class BeansDescriptorTestCase {
 
     @Test
     public void shouldBeAbleToReadWhatWasExported() throws Exception {
-        final String desc = create().decorators(FactoryImpl.instance().decoratorsBeans10()
+        final String desc = create().decorators(FactoryJavaEEImpl.instance().decoratorsBeans10()
             .clazz(TestDecorator.class.getName(), TestDecorator.class.getName())).exportAsString();
 
         final String roundtrip = Descriptors.importAs(BeansDescriptor.class).fromString(desc).exportAsString();
@@ -231,10 +231,10 @@ public class BeansDescriptorTestCase {
 
     @Test
     public void shouldBeAbleToGenerateComplexDescriptor() throws Exception {
-        final BeansDescriptor beans = Descriptors.create(BeansDescriptor.class).interceptors(FactoryImpl.instance().interceptorsBeans10()
+        final BeansDescriptor beans = Descriptors.create(BeansDescriptor.class).interceptors(FactoryJavaEEImpl.instance().interceptorsBeans10()
             .clazz(TestInterceptor.class.getName(), TestAnotherInterceptor.class.getName()))
-            .decorators(FactoryImpl.instance().decoratorsBeans10().clazz(TestDecorator.class.getName()))
-            .alternatives(FactoryImpl.instance().alternativesBeans10()
+            .decorators(FactoryJavaEEImpl.instance().decoratorsBeans10().clazz(TestDecorator.class.getName()))
+            .alternatives(FactoryJavaEEImpl.instance().alternativesBeans10()
             .stereotype(TestAlternativeStereoType.class.getName()));
         String xml = beans.exportAsString();
 

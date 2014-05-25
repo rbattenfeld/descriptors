@@ -23,7 +23,6 @@ import java.io.FileReader;
 
 import org.jboss.shrinkwrap.descriptor.api.Descriptors;
 import org.jboss.shrinkwrap.descriptor.api.connector10.ConnectorDescriptor;
-import org.jboss.shrinkwrap.descriptor.impl.FactoryImpl;
 import org.jboss.shrinkwrap.descriptor.test.util.XmlAssert;
 import org.junit.Test;
 
@@ -45,28 +44,28 @@ public class ConnectorDescriptorTestCase {
 
     @Test
     public void testHornetQExample() throws Exception {    	
-        final ConnectorDescriptor jca10Generated = create()
-            .displayName("Sample Adapter")
+        final ConnectorDescriptor jca10Generated = create();
+        jca10Generated.displayName("Sample Adapter")
             .description("It is a sample resource adapter")
             .vendorName("JBoss")
             .specVersion("1.0")
             .eisType("Sample")
             .version("1.0")
-            .license(FactoryImpl.instance().licenseConnector10()
+            .license(jca10Generated.factory().licenseConnector10()
             	.description("description0")
             	.licenseRequired("true"))
-            .resourceadapter(FactoryImpl.instance().resourceadapterConnector10()
+            .resourceadapter(jca10Generated.factory().resourceadapterConnector10()
         		.managedconnectionfactoryClass("org.jboss.messaging.adapters.jcasample.SampleManagedConnectionFactory")
                 .connectionfactoryInterface("javax.resource.cci.ConnectionFactory")
                 .connectionfactoryImplClass("org.jboss.messaging.adapters.jcasample.SampleConnectionFactory")
                 .connectionInterface("javax.resource.cci.Connection")
                 .connectionImplClass("org.jboss.messaging.adapters.jcasample.SampleConnection")
                 .transactionSupport("NoTransaction")
-                .addConfigProperty(FactoryImpl.instance().configPropertyConnector10()
+                .addConfigProperty(jca10Generated.factory().configPropertyConnector10()
                 	.configPropertyName("Input")
                     .configPropertyType("java.lang.String")
                     .configPropertyValue("test messages"))
-                .addAuthenticationMechanism(FactoryImpl.instance().authenticationMechanismConnector10()
+                .addAuthenticationMechanism(jca10Generated.factory().authenticationMechanismConnector10()
                 	.authenticationMechanismType("BasicPassword")
                     .credentialInterface("javax.resource.security.PasswordCredential"))
                 .reauthenticationSupport("false"));

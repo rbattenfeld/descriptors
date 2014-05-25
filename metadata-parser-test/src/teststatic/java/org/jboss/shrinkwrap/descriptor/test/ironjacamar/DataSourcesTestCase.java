@@ -5,11 +5,7 @@ import java.io.FileReader;
 import java.text.SimpleDateFormat;
 import java.util.TimeZone;
 
-import org.jboss.datasources.api.DatasourcesDescriptor;
-import org.jboss.shrinkwrap.descriptor.api.Descriptors;
-import org.jboss.shrinkwrap.descriptor.test.util.XmlAssert;
 import org.junit.Before;
-import org.junit.Test;
 
 
 public class DataSourcesTestCase

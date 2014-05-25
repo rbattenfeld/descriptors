@@ -37,8 +37,11 @@ public class MetadataParserTask extends Task {
     /** Trace flag */
     protected boolean verbose;
 
+    /** Trace flag */
+    protected boolean generateFactory;
+
     /** Factory flag */
-    protected boolean generatedFactory;
+    protected String factoryContext;
 
     /** Classpath ref */
     protected String classpathRef;
@@ -60,7 +63,8 @@ public class MetadataParserTask extends Task {
      */
     public MetadataParserTask() {
         this.verbose = false;
-        this.generatedFactory = false;
+        this.generateFactory = false;
+        this.factoryContext = null;
         this.classpathRef = null;
         this.path = null;
         this.descriptors = null;
@@ -74,8 +78,18 @@ public class MetadataParserTask extends Task {
      * @param v
      *            The value
      */
-    public void setGeneratedFactory(boolean v) {
-        generatedFactory = v;
+    public void setFactoryContext(String v) {
+        factoryContext = v;
+    }
+
+    /**
+     * Set the verbose flag
+     *
+     * @param v
+     *            The value
+     */
+    public void setGenerateFactory(boolean v) {
+        generateFactory = v;
     }
 
     /**
@@ -185,7 +199,7 @@ public class MetadataParserTask extends Task {
             }
 
             final MetadataParser metadataParser = new MetadataParser();
-            metadataParser.parse(path, data, javadoc, verbose, generatedFactory);
+            metadataParser.parse(path, data, javadoc, verbose, generateFactory, factoryContext);
         } catch (Throwable t) {
             throw new BuildException(t.getMessage(), t);
         } finally {

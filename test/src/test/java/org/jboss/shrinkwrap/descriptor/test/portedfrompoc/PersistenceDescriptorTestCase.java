@@ -18,20 +18,15 @@ package org.jboss.shrinkwrap.descriptor.test.portedfrompoc;
 
 import static org.jboss.shrinkwrap.descriptor.test.util.XmlAssert.assertAbsenceUsingXPath;
 import static org.jboss.shrinkwrap.descriptor.test.util.XmlAssert.assertPresenceUsingXPath;
-import static org.junit.Assert.assertEquals;
 
-import java.util.List;
 import java.util.logging.Logger;
 
 import junit.framework.Assert;
 
 import org.jboss.shrinkwrap.descriptor.api.Descriptors;
 import org.jboss.shrinkwrap.descriptor.api.persistence20.PersistenceDescriptor;
-import org.jboss.shrinkwrap.descriptor.api.persistence20.PersistenceUnit;
 import org.jboss.shrinkwrap.descriptor.api.persistence20.PersistenceUnitTransactionType;
-import org.jboss.shrinkwrap.descriptor.api.persistence20.Properties;
-import org.jboss.shrinkwrap.descriptor.api.persistence20.Property;
-import org.jboss.shrinkwrap.descriptor.impl.FactoryImpl;
+import org.jboss.shrinkwrap.descriptor.impl.FactoryJavaEEImpl;
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -87,7 +82,7 @@ public class PersistenceDescriptorTestCase {
 
     @Test
     public void shouldBeAbleToAddMultiplePersistenceUnits() throws Exception {
-        String desc = create().addPersistenceUnit(FactoryImpl.instance().persistenceUnitPersistence20().name(name2)).exportAsString();
+        String desc = create().addPersistenceUnit(FactoryJavaEEImpl.instance().persistenceUnitPersistence20().name(name2)).exportAsString();
 
         assertPresenceUsingXPath(desc, "/persistence/persistence-unit/@name", name, name2);
     }
@@ -104,14 +99,14 @@ public class PersistenceDescriptorTestCase {
     public void shouldOnlyCreateOnePersistenceUnitWithSameName() throws Exception {
         // create() creates a persistenceUnit with "name".
         // Add a new persistence unit with "name", should return the same node. name is defined unique
-        String desc = create().addPersistenceUnit(FactoryImpl.instance().persistenceUnitPersistence20().name(name)).exportAsString();
+        String desc = create().addPersistenceUnit(FactoryJavaEEImpl.instance().persistenceUnitPersistence20().name(name)).exportAsString();
 
         assertPresenceUsingXPath(desc, "/persistence/persistence-unit/@name", name);
     }
 
     @Test
     public void shouldBeAbleToAddClasses() throws Exception {
-        String desc = create().addPersistenceUnit(FactoryImpl.instance().persistenceUnitPersistence20()
+        String desc = create().addPersistenceUnit(FactoryJavaEEImpl.instance().persistenceUnitPersistence20()
             .clazz(PersistenceDescriptor.class.getName(), PersistenceDescriptor.class.getName())).exportAsString();
 
         assertPresenceUsingXPath(desc, "/persistence/persistence-unit/class", PersistenceDescriptor.class.getName(),
@@ -120,7 +115,7 @@ public class PersistenceDescriptorTestCase {
 
 //    @Test
 //    public void shouldBeAbleToAddDescription() throws Exception {
-//        PersistenceUnit unit = FactoryImpl.instance().persistenceUnitPersistence20().description(name);
+//        PersistenceUnit unit = FactoryJavaEEImpl.instance().persistenceUnitPersistence20().description(name);
 //        String desc = unit.exportAsString();
 //        assertPresenceUsingXPath(desc, "/persistence/persistence-unit/description", name);
 //        Assert.assertEquals(name, unit.getDescription());
@@ -128,21 +123,21 @@ public class PersistenceDescriptorTestCase {
 
     @Test
     public void shouldBeAbleToSetExcludeUnlistedClasses() throws Exception {
-        String desc = create().addPersistenceUnit(FactoryImpl.instance().persistenceUnitPersistence20().excludeUnlistedClasses(true)).exportAsString();
+        String desc = create().addPersistenceUnit(FactoryJavaEEImpl.instance().persistenceUnitPersistence20().excludeUnlistedClasses(true)).exportAsString();
 
         assertPresenceUsingXPath(desc, "/persistence/persistence-unit/exclude-unlisted-classes", "true");
     }
 
     @Test
     public void shouldBeAbleToSetIncludeUnlistedClasses() throws Exception {
-        String desc = create().addPersistenceUnit(FactoryImpl.instance().persistenceUnitPersistence20().excludeUnlistedClasses(false)).exportAsString();
+        String desc = create().addPersistenceUnit(FactoryJavaEEImpl.instance().persistenceUnitPersistence20().excludeUnlistedClasses(false)).exportAsString();
 
         assertPresenceUsingXPath(desc, "/persistence/persistence-unit/exclude-unlisted-classes", "false");
     }
 
 //    @Test
 //    public void shouldBeAbleToSetJTADataSource() throws Exception {
-//        PersistenceUnit unit = create().addPersistenceUnit(FactoryImpl.instance().persistenceUnitPersistence20().jtaDataSource(name);
+//        PersistenceUnit unit = create().addPersistenceUnit(FactoryJavaEEImpl.instance().persistenceUnitPersistence20().jtaDataSource(name);
 //        String desc = unit).exportAsString();
 //
 //        assertPresenceUsingXPath(desc, "/persistence/persistence-unit/jta-data-source", name);
@@ -162,7 +157,7 @@ public class PersistenceDescriptorTestCase {
     @Test
     @Ignore("Missing in the new API")
     public void shouldBeAbleToReplaceNonJTADataSourceWithJTADataSource() throws Exception {
-        String desc = create().addPersistenceUnit(FactoryImpl.instance().persistenceUnitPersistence20().nonJtaDataSource(name2).jtaDataSource(name))
+        String desc = create().addPersistenceUnit(FactoryJavaEEImpl.instance().persistenceUnitPersistence20().nonJtaDataSource(name2).jtaDataSource(name))
             .exportAsString();
 
         assertPresenceUsingXPath(desc, "/persistence/persistence-unit/jta-data-source", name);
@@ -171,7 +166,7 @@ public class PersistenceDescriptorTestCase {
 
 //    @Test
 //    public void shouldBeAbleToSetNonJtaDataSource() throws Exception {
-//        PersistenceUnit unit = create().addPersistenceUnit(FactoryImpl.instance().persistenceUnitPersistence20().nonJtaDataSource(name);
+//        PersistenceUnit unit = create().addPersistenceUnit(FactoryJavaEEImpl.instance().persistenceUnitPersistence20().nonJtaDataSource(name);
 //        String desc = unit).exportAsString();
 //
 //        assertPresenceUsingXPath(desc, "/persistence/persistence-unit/non-jta-data-source", name);
@@ -180,35 +175,35 @@ public class PersistenceDescriptorTestCase {
 
     @Test
     public void shouldBeAbleToSetJarFile() throws Exception {
-        String desc = create().addPersistenceUnit(FactoryImpl.instance().persistenceUnitPersistence20().jarFile(name)).exportAsString();
+        String desc = create().addPersistenceUnit(FactoryJavaEEImpl.instance().persistenceUnitPersistence20().jarFile(name)).exportAsString();
 
         assertPresenceUsingXPath(desc, "/persistence/persistence-unit/jar-file", name);
     }
 
     @Test
     public void shouldBeAbleToSetJarFiles() throws Exception {
-        String desc = create().addPersistenceUnit(FactoryImpl.instance().persistenceUnitPersistence20().jarFile(name, name2)).exportAsString();
+        String desc = create().addPersistenceUnit(FactoryJavaEEImpl.instance().persistenceUnitPersistence20().jarFile(name, name2)).exportAsString();
 
         assertPresenceUsingXPath(desc, "/persistence/persistence-unit/jar-file", name, name2);
     }
 
     @Test
     public void shouldBeAbleToSetMappingFile() throws Exception {
-        String desc = create().addPersistenceUnit(FactoryImpl.instance().persistenceUnitPersistence20().mappingFile(name)).exportAsString();
+        String desc = create().addPersistenceUnit(FactoryJavaEEImpl.instance().persistenceUnitPersistence20().mappingFile(name)).exportAsString();
 
         assertPresenceUsingXPath(desc, "/persistence/persistence-unit/mapping-file", name);
     }
 
     @Test
     public void shouldBeAbleToSetMappingFiles() throws Exception {
-        String desc = create().addPersistenceUnit(FactoryImpl.instance().persistenceUnitPersistence20().mappingFile(name, name2)).exportAsString();
+        String desc = create().addPersistenceUnit(FactoryJavaEEImpl.instance().persistenceUnitPersistence20().mappingFile(name, name2)).exportAsString();
 
         assertPresenceUsingXPath(desc, "/persistence/persistence-unit/mapping-file", name, name2);
     }
 
     @Test
     public void shouldBeAbleToSetTransactionType() throws Exception {
-        String desc = create().addPersistenceUnit(FactoryImpl.instance().persistenceUnitPersistence20().transactionType(PersistenceUnitTransactionType._JTA))
+        String desc = create().addPersistenceUnit(FactoryJavaEEImpl.instance().persistenceUnitPersistence20().transactionType(PersistenceUnitTransactionType._JTA))
             .exportAsString();
 
         assertPresenceUsingXPath(desc, "/persistence/persistence-unit/@transaction-type",
@@ -217,7 +212,7 @@ public class PersistenceDescriptorTestCase {
 
 //    @Test
 //    public void shouldBeAbleToAddProperties() throws Exception {
-//        String desc = create().addPersistenceUnit(FactoryImpl.instance().persistenceUnitPersistence20().getOrCreateProperties().getOrCreateProperty().name(name)
+//        String desc = create().addPersistenceUnit(FactoryJavaEEImpl.instance().persistenceUnitPersistence20().getOrCreateProperties().getOrCreateProperty().name(name)
 //            .value(name2)).createProperty().name(name2).value(name)))).exportAsString();
 //
 //        assertPresenceUsingXPath(desc, "/persistence/persistence-unit/properties/property/@name", name, name2);
@@ -230,7 +225,7 @@ public class PersistenceDescriptorTestCase {
     // It's accessible through the list.get(i), but I guess that's
     // not the desired approach.
 //    public void addingDuplicateNamePropertyUpdatesExisting() throws Exception {
-//        String desc = create().addPersistenceUnit(FactoryImpl.instance().persistenceUnitPersistence20().getOrCreateProperties().createProperty().name(name)
+//        String desc = create().addPersistenceUnit(FactoryJavaEEImpl.instance().persistenceUnitPersistence20().getOrCreateProperties().createProperty().name(name)
 //            .value(name2)).createProperty().name(name).value(name)))).exportAsString();
 //
 //        assertPresenceUsingXPath(desc, "/persistence/persistence-unit/properties/property/@name", name, name);
@@ -239,7 +234,7 @@ public class PersistenceDescriptorTestCase {
 
 //    @Test
 //    public void shouldBeAbleToGetProperties() throws Exception {
-//        PersistenceUnit def = create().addPersistenceUnit(FactoryImpl.instance().persistenceUnitPersistence20().getOrCreateProperties()
+//        PersistenceUnit def = create().addPersistenceUnit(FactoryJavaEEImpl.instance().persistenceUnitPersistence20().getOrCreateProperties()
 //            .createProperty().name(name).value(name2)).createProperty().name(name2).value(name)));
 //
 //        List<Property<Properties<PersistenceUnit>>> properties = def.getOrCreateProperties()
@@ -286,7 +281,7 @@ public class PersistenceDescriptorTestCase {
 
 //    @Test
 //    public void shouldBeAbleToClearProperties() throws Exception {
-//        Properties<PersistenceUnit> def = create().addPersistenceUnit(FactoryImpl.instance().persistenceUnitPersistence20()
+//        Properties<PersistenceUnit> def = create().addPersistenceUnit(FactoryJavaEEImpl.instance().persistenceUnitPersistence20()
 //            .getOrCreateProperties().createProperty().name(name).value(name2)).createProperty().name(name2)
 //            .value(name));
 //
@@ -301,7 +296,7 @@ public class PersistenceDescriptorTestCase {
 
 //    @Test
 //    public void shouldBeAbleToClearPropertiesAndAddNew() throws Exception {
-//        Properties<PersistenceUnit> def = create().addPersistenceUnit(FactoryImpl.instance().persistenceUnitPersistence20()
+//        Properties<PersistenceUnit> def = create().addPersistenceUnit(FactoryJavaEEImpl.instance().persistenceUnitPersistence20()
 //            .getOrCreateProperties().createProperty().name(name).value(name2)).createProperty().name(name2)
 //            .value(name));
 //
@@ -325,14 +320,14 @@ public class PersistenceDescriptorTestCase {
 //
 //    @Test
 //    public void shouldBeAbleSetSharedCacheMode() throws Exception {
-//        String desc = create().addPersistenceUnit(FactoryImpl.instance().persistenceUnitPersistence20().sharedCacheMode("ALL")).exportAsString();
+//        String desc = create().addPersistenceUnit(FactoryJavaEEImpl.instance().persistenceUnitPersistence20().sharedCacheMode("ALL")).exportAsString();
 //
 //        assertPresenceUsingXPath(desc, "/persistence/persistence-unit/shared-cache-mode", "ALL");
 //    }
 
 //    @Test
 //    public void shouldBeAbleSetValidationMode() throws Exception {
-//        String desc = create().addPersistenceUnit(FactoryImpl.instance().persistenceUnitPersistence20().validationMode("AUTO")).exportAsString();
+//        String desc = create().addPersistenceUnit(FactoryJavaEEImpl.instance().persistenceUnitPersistence20().validationMode("AUTO")).exportAsString();
 //
 //        assertPresenceUsingXPath(desc, "/persistence/persistence-unit/validation-mode", "AUTO");
 //    }
@@ -385,6 +380,6 @@ public class PersistenceDescriptorTestCase {
     // -------------------------------------------------------------------------------------||
 
     private PersistenceDescriptor create() {
-        return Descriptors.create(PersistenceDescriptor.class).addPersistenceUnit(FactoryImpl.instance().persistenceUnitPersistence20().name(name));
+        return Descriptors.create(PersistenceDescriptor.class).addPersistenceUnit(FactoryJavaEEImpl.instance().persistenceUnitPersistence20().name(name));
     }
 }

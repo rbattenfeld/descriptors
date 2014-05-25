@@ -78,7 +78,7 @@ public class MetadataParser {
      */
     @SuppressWarnings("unchecked")
     public void parse(final MetadataParserPath path, final List<?> confList, final List<?> javadocTags,
-        final boolean verbose, final boolean generatedFactory) throws Exception {
+        final boolean verbose, final boolean generateFactory, final String factoryContext) throws Exception {
         checkArguments(path, confList);
 
         pathToMetadata = createTempFile(verbose);
@@ -162,12 +162,12 @@ public class MetadataParser {
         }
 
         if (path.getPathToApi() != null && path.getPathToImpl() != null) {
-            generateCode(path, verbose);
+            generateCode(path, verbose, factoryContext);
             PackageInfo.copyPackageInfo(path, metadata, verbose);
         }
 
-        if (generatedFactory) {
-            new MetadataFactoryBuilder().createFactory(path.pathToApi, path.pathToImpl);
+        if (generateFactory && factoryContext != null) {
+            new MetadataFactoryBuilder().createFactory(path.pathToApi, path.pathToImpl, factoryContext);
         }
     }
 
@@ -176,7 +176,7 @@ public class MetadataParser {
      *
      * @throws TransformerException
      */
-    public void generateCode(final MetadataParserPath path, final boolean verbose) throws TransformerException {
+    public void generateCode(final MetadataParserPath path, final boolean verbose, final String factoryContext) throws TransformerException {
         /** initialize the map which will overwrite global parameters as defined in metadata.xsl/ddJava.xsl */
         final Map<String, String> xsltParameters = new HashMap<String, String>();
         xsltParameters.put("gOutputFolder", getURIPath(path.getPathToImpl()));
@@ -184,6 +184,7 @@ public class MetadataParser {
         xsltParameters.put("gOutputFolderTest", getURIPath(path.getPathToTest()));
         xsltParameters.put("gOutputFolderService", getURIPath(path.getPathToServices()));
         xsltParameters.put("gVerbose", Boolean.toString(verbose));
+        xsltParameters.put("gFactoryContext", factoryContext);
 
         final InputStream is = MetadataParser.class.getResourceAsStream("/META-INF/ddJavaAll.xsl");
         if (log.isLoggable(Level.FINE)) {

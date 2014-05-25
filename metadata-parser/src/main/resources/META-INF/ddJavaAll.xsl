@@ -10,6 +10,7 @@
     <xsl:param name="gOutputFolderService" select="''"/>
     <xsl:param name="gVerbose" as="xs:boolean" select="false()"/>
     <xsl:param name="gIsSinceJavaDocEnabled" as="xs:boolean" select="false()"/>
+    <xsl:param name="gFactoryContext" select="''"/>
     <xsl:variable name="vLower" select="'abcdefghijklmnopqrstuvwxyz'"/>
     <xsl:variable name="vUpper" select="'ABCDEFGHIJKLMNOPQRSTUVWXYZ'"/>
     <xsl:variable name="gDataTypes" select="//datatypes"/>
@@ -793,6 +794,10 @@
                     <xsl:value-of select="concat('import ', common/@commonApi, '.*;', '&#10;')"/>  
                 </xsl:if>
                 
+                <xsl:if test="$gFactoryContext != ''">
+                    <xsl:value-of select="concat('import org.jboss.shrinkwrap.descriptor.api.Factory', $gFactoryContext, ';&#10;')"/>
+                </xsl:if>
+               
                 <xsl:value-of select="xdd:writeDescriptorJavaDoc($vClassname, $vSchema, $gJavaDocs)"/>
                 <xsl:value-of select="xdd:classHeaderDeclaration('interface', $vClassname)"/>
                 <xsl:value-of select="concat(' extends Descriptor, DescriptorNamespace', '&lt;', $vClassname, '&gt;')"/>                
@@ -806,7 +811,10 @@
                     </xsl:for-each>
                     <xsl:value-of select="'&gt;'"/>
                 </xsl:if>
-                <xsl:value-of select="concat(' {', '&#10;&#10;')"/>                
+                <xsl:value-of select="concat(' {', '&#10;&#10;')"/>  
+                <xsl:if test="$gFactoryContext != ''">
+                    <xsl:value-of select="xdd:writeFactory(true())"/>
+                </xsl:if>
                 <xsl:variable name="vType" select=" substring-after($pDescriptor/element/@type, ':')"/>
                 <xsl:variable name="vNamespace" select=" substring-before($pDescriptor/element/@type, ':')"/>                   
                 <xsl:for-each select="//classes/class[@name=$vType and @namespace=$vNamespace and (@packageApi=$vPackage or not(xdd:versionLessPackageName(@packageApi) = xdd:versionLessPackageName($vPackage)))]">
@@ -916,6 +924,12 @@
                 <xsl:text>import org.jboss.shrinkwrap.descriptor.impl.base.XMLDate;&#10;</xsl:text>
                 <xsl:text>import org.jboss.shrinkwrap.descriptor.spi.node.Node;&#10;</xsl:text>
                 <xsl:text>import org.jboss.shrinkwrap.descriptor.impl.base.ChildNodeInitializer;&#10;</xsl:text>
+                
+                <xsl:if test="$gFactoryContext != ''">
+                    <xsl:value-of select="concat('import org.jboss.shrinkwrap.descriptor.api.Factory', $gFactoryContext, ';&#10;')"/>
+                    <xsl:value-of select="concat('import org.jboss.shrinkwrap.descriptor.impl.Factory', $gFactoryContext, 'Impl;', '&#10;&#10;')"/>
+                </xsl:if>
+                
                 <xsl:text>&#10;</xsl:text>
                 <xsl:value-of select=" xdd:writeDescriptorJavaDoc($vInterfaceName, $vSchema, $gJavaDocs)"/>
                 <xsl:value-of select="xdd:classHeaderDeclaration('class', $vClassnameImpl)"/>
@@ -931,6 +945,9 @@
                 <xsl:value-of select="xdd:writeMethodComment()"/>
                 <!-- write all methods -->
                 <xsl:value-of select="xdd:writeNodeProviderMethods($vNodeName)"/>
+                <xsl:if test="$gFactoryContext != ''">
+                    <xsl:value-of select="xdd:writeFactory(false())"/>
+                </xsl:if>
                 <xsl:value-of select="xdd:writeDescriptorNamespaceMethods($pDescriptor, $vInterfaceName)"/>
 <!--                <xsl:value-of select="xdd:writeGetNode()"/>-->
                 <xsl:for-each select="element">
@@ -3345,14 +3362,48 @@
     <!-- ****************************************************** -->
     <!-- ****** Function which writes the Child interface ***** -->
     <!-- ****************************************************** -->
-    <xsl:function name="xdd:writeChildUp">
+  <!--  <xsl:function name="xdd:writeChildUp">
         <xsl:value-of select="'   public T up()&#10;'"/>
         <xsl:value-of select="'   {&#10;'"/>
         <xsl:value-of select="'      return t;&#10;'"/>
         <xsl:value-of select="'   }&#10;'"/>
         <xsl:text>&#10;</xsl:text>
         <xsl:text>&#10;</xsl:text>
+    </xsl:function>-->
+
+    
+    <!-- ****************************************************** -->
+    <!-- ****** Function which writes the Child interface ***** -->
+    <!-- ****************************************************** -->
+    <xsl:function name="xdd:writeFactory">
+        <xsl:param name="pWriteInterface" as="xs:boolean"/>        
+        <xsl:variable name="vSignature" select="concat('public Factory', $gFactoryContext, ' factory()')"/>
+        <xsl:value-of select="concat('', '&#10;')"/>
+        <xsl:value-of select="concat('   /**', '&#10;')"/>
+        <xsl:value-of select="concat('    * Returns the factory instance.', '&#10;')"/>
+        <xsl:value-of select="concat('    * @return &lt;code&gt;Factory&lt;/code&gt; ', '&#10;')"/>
+        <xsl:value-of select="concat('    */', '&#10;')"/>
+        <xsl:choose>
+            <xsl:when test="$pWriteInterface=true()">
+                <xsl:value-of select="concat('   ', $vSignature, ';&#10;')"/>
+            </xsl:when>
+            <xsl:otherwise>
+                <xsl:value-of select="concat('   ', $vSignature, ' {&#10;')"/>
+                <xsl:value-of select="concat('      return new Factory',  $gFactoryContext, 'Impl();', '&#10;')"/>
+                <xsl:value-of select="concat('   }', '&#10;')"/>
+            </xsl:otherwise>
+        </xsl:choose>
     </xsl:function>
+    
+    <!-- ****************************************************** -->
+    <!-- ****** Function which returns the context ************ -->
+    <!-- ****************************************************** -->
+    <xsl:function name="xdd:getContext">
+        <xsl:variable name="vTemp" select="substring-after($gOutputFolderApi, '-')"/>
+        <xsl:variable name="vContext" select="substring-before($vTemp, '/')"/>
+        <xsl:sequence select="$vContext"/>
+    </xsl:function>
+    
 
     <!-- *********************************************************** -->
     <!-- ****** Function which writes the ChildNodeInitializer ***** -->

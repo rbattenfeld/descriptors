@@ -21,11 +21,8 @@ import static org.junit.Assert.assertEquals;
 import java.io.BufferedReader;
 import java.io.FileReader;
 
-import junit.framework.Assert;
-
 import org.jboss.shrinkwrap.descriptor.api.Descriptors;
 import org.jboss.shrinkwrap.descriptor.api.connector16.ConnectorDescriptor;
-import org.jboss.shrinkwrap.descriptor.impl.FactoryImpl;
 import org.jboss.shrinkwrap.descriptor.test.util.XmlAssert;
 import org.junit.Test;
 
@@ -47,24 +44,24 @@ public class ConnectorDescriptorTestCase {
 
     @Test
     public void testGenExample() throws Exception {
-      ConnectorDescriptor jca16Descr = create()
-         .addDefaultNamespaces()
+      ConnectorDescriptor jca16Descr = create();
+      jca16Descr.addDefaultNamespaces()
          .version("1.6")
          .moduleName("module-name0")
          .description("description0")
          .displayName("display-name0")
-         .addIcon(FactoryImpl.instance().iconTypeJavaee6()
+         .addIcon(jca16Descr.factory().iconTypeJavaee6()
             .smallIcon("small-icon0")
             .largeIcon("large-icon0"))
          .vendorName("vendor-name0")
          .eisType("eis-type0")
          .resourceadapterVersion("resourceadapter-version0")
-         .license(FactoryImpl.instance().licenseTypeConnector16()
+         .license(jca16Descr.factory().licenseTypeConnector16()
             .description("description1")
             .licenseRequired(false))
-         .resourceadapter(FactoryImpl.instance().resourceadapterTypeConnector16()
+         .resourceadapter(jca16Descr.factory().resourceadapterTypeConnector16()
             .resourceadapterClass("resourceadapter-class0")
-            .addConfigProperty(FactoryImpl.instance().configPropertyTypeConnector16()
+            .addConfigProperty(jca16Descr.factory().configPropertyTypeConnector16()
                .description("description2")
                .configPropertyName("config-property-name0")
                .configPropertyType("java.lang.Boolean")
@@ -72,10 +69,10 @@ public class ConnectorDescriptorTestCase {
                .configPropertyIgnore(false)
                .configPropertySupportsDynamicUpdates(false)
                .configPropertyConfidential(false))
-            .outboundResourceadapter(FactoryImpl.instance().outboundResourceadapterTypeConnector16()
-               .addConnectionDefinition(FactoryImpl.instance().connectionDefinitionTypeConnector16()
+            .outboundResourceadapter(jca16Descr.factory().outboundResourceadapterTypeConnector16()
+               .addConnectionDefinition(jca16Descr.factory().connectionDefinitionTypeConnector16()
                   .managedconnectionfactoryClass("managedconnectionfactory-class0")
-                  .addConfigProperty(FactoryImpl.instance().configPropertyTypeConnector16()
+                  .addConfigProperty(jca16Descr.factory().configPropertyTypeConnector16()
                      .description("description3")
                      .configPropertyName("config-property-name1")
                      .configPropertyType("java.lang.Boolean")
@@ -88,21 +85,21 @@ public class ConnectorDescriptorTestCase {
                   .connectionInterface("connection-interface0")
                   .connectionImplClass("connection-impl-class0"))
                .transactionSupport("NoTransaction")
-               .addAuthenticationMechanism(FactoryImpl.instance().authenticationMechanismTypeConnector16()
+               .addAuthenticationMechanism(jca16Descr.factory().authenticationMechanismTypeConnector16()
                   .description("description4")
                   .authenticationMechanismType("authentication-mechanism-type0")
                   .credentialInterface("javax.resource.spi.security.PasswordCredential"))
                .reauthenticationSupport(false))
-            .inboundResourceadapter(FactoryImpl.instance().inboundResourceadapterTypeConnector16()
-               .messageadapter(FactoryImpl.instance().messageadapterTypeConnector16()
-                  .addMessagelistener(FactoryImpl.instance().messagelistenerTypeConnector16()
+            .inboundResourceadapter(jca16Descr.factory().inboundResourceadapterTypeConnector16()
+               .messageadapter(jca16Descr.factory().messageadapterTypeConnector16()
+                  .addMessagelistener(jca16Descr.factory().messagelistenerTypeConnector16()
                      .messagelistenerType("messagelistener-type0")
-                     .activationspec(FactoryImpl.instance().activationspecTypeConnector16()
+                     .activationspec(jca16Descr.factory().activationspecTypeConnector16()
                         .activationspecClass("activationspec-class0")))))
-            .addAdminobject(FactoryImpl.instance().adminobjectTypeConnector16()
+            .addAdminobject(jca16Descr.factory().adminobjectTypeConnector16()
                .adminobjectInterface("adminobject-interface0")
                .adminobjectClass("adminobject-class0")
-               .addConfigProperty(FactoryImpl.instance().configPropertyTypeConnector16()
+               .addConfigProperty(jca16Descr.factory().configPropertyTypeConnector16()
                   .description("description5")
                   .configPropertyName("config-property-name2")
                   .configPropertyType("java.lang.Boolean")
@@ -110,7 +107,7 @@ public class ConnectorDescriptorTestCase {
                   .configPropertyIgnore(false)
                   .configPropertySupportsDynamicUpdates(false)
                   .configPropertyConfidential(false)))
-            .addSecurityPermission(FactoryImpl.instance().securityPermissionTypeConnector16()
+            .addSecurityPermission(jca16Descr.factory().securityPermissionTypeConnector16()
                .description("description6")
                .securityPermissionSpec("security-permission-spec0")))
         .requiredWorkContext("required-work-context0");

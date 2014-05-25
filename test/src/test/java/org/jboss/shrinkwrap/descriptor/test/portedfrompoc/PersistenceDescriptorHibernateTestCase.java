@@ -4,7 +4,7 @@ import static org.jboss.shrinkwrap.descriptor.test.util.XmlAssert.assertPresence
 
 import org.jboss.shrinkwrap.descriptor.api.Descriptors;
 import org.jboss.shrinkwrap.descriptor.api.persistence20.PersistenceDescriptor;
-import org.jboss.shrinkwrap.descriptor.impl.FactoryImpl;
+import org.jboss.shrinkwrap.descriptor.impl.FactoryJavaEEImpl;
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -17,7 +17,7 @@ public class PersistenceDescriptorHibernateTestCase {
 
     @Test
     public void shouldBeAbleSetProviderHibernate() throws Exception {
-        String desc = create().addPersistenceUnit(FactoryImpl.instance().persistenceUnitPersistence20().provider("HIBERNATE")).exportAsString();
+        String desc = create().addPersistenceUnit(FactoryJavaEEImpl.instance().persistenceUnitPersistence20().provider("HIBERNATE")).exportAsString();
 
         assertPresenceUsingXPath(desc, "/persistence/persistence-unit/provider", "HIBERNATE");
     }
@@ -94,7 +94,7 @@ public class PersistenceDescriptorHibernateTestCase {
     // }
     //
     private PersistenceDescriptor create() {
-        return Descriptors.create(PersistenceDescriptor.class).addPersistenceUnit(FactoryImpl.instance().persistenceUnitPersistence20()
+        return Descriptors.create(PersistenceDescriptor.class).addPersistenceUnit(FactoryJavaEEImpl.instance().persistenceUnitPersistence20()
             .name(this.getClass().getSimpleName()));
     }
 }

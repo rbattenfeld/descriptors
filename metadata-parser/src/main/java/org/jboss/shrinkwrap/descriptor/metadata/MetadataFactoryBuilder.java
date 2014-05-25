@@ -3,13 +3,11 @@ package org.jboss.shrinkwrap.descriptor.metadata;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Pattern;
 
-import org.jboss.shrinkwrap.descriptor.api.CommonExtends;
 import org.jboss.shrinkwrap.descriptor.metadata.codegen.CodeGen;
-import org.w3c.dom.Element;
 
 import com.sun.codemodel.ClassType;
-import com.sun.codemodel.JBlock;
 import com.sun.codemodel.JClass;
 import com.sun.codemodel.JCodeModel;
 import com.sun.codemodel.JDefinedClass;
@@ -20,11 +18,10 @@ import com.thoughtworks.qdox.JavaProjectBuilder;
 import com.thoughtworks.qdox.model.JavaAnnotation;
 import com.thoughtworks.qdox.model.JavaClass;
 import com.thoughtworks.qdox.model.JavaSource;
-import com.thoughtworks.qdox.model.expression.AnnotationValue;
 
 public class MetadataFactoryBuilder {
 
-    public void createFactory(final String pathToApi, final String pathToImpl) throws Exception {
+    public void createFactory(final String pathToApi, final String pathToImpl, final String factoryContext) throws Exception {
         final List<File> fileList = getFiles(pathToApi);
         final List<String> factoryClasses = new ArrayList<String>();
         final JavaProjectBuilder builder = new JavaProjectBuilder();
@@ -36,18 +33,30 @@ public class MetadataFactoryBuilder {
                     && !clazz.isEnum()
                     && !isAnnotated(clazz)
                     && !clazz.getName().endsWith("Descriptor")
-                    && !clazz.getFullyQualifiedName().equals("org.jboss.shrinkwrap.descriptor.api.Factory")) {
+                    && !clazz.getFullyQualifiedName().startsWith("org.jboss.shrinkwrap.descriptor.api.Factory")) {
                         factoryClasses.add(clazz.getFullyQualifiedName());
                     }
             }
         }
-        createFactoryApi(pathToApi, "org.jboss.shrinkwrap.descriptor.api.Factory", factoryClasses);
-        createFactoryImpl(pathToImpl, "org.jboss.shrinkwrap.descriptor.api.Factory", "org.jboss.shrinkwrap.descriptor.impl.FactoryImpl", factoryClasses);
+
+//        final String context = CodeGen.getPascalizeCase(factoryContext);
+        createFactoryApi(pathToApi, "org.jboss.shrinkwrap.descriptor.api.Factory" + factoryContext, factoryClasses);
+        createFactoryImpl(pathToImpl, "org.jboss.shrinkwrap.descriptor.api.Factory" + factoryContext, "org.jboss.shrinkwrap.descriptor.impl.Factory" +  factoryContext + "Impl", factoryClasses);
     }
 
     //-----------------------------------------------------------------------||
     //--Private Methods -----------------------------------------------------||
     //-----------------------------------------------------------------------||
+
+    private String getContext(final String pathToApi) {
+        final Pattern pattern = Pattern.compile("/api-(.*?)/");
+        final java.util.regex.Matcher matcher = pattern.matcher(pathToApi);
+        if (matcher.find()) {
+            return matcher.group(1);
+        } else {
+            return "";
+        }
+    }
 
     private void createFactoryApi(final String pathToApi, final String fullyQualifiedFactoryName, final List<String> factoryClasses) throws Exception {
         final JCodeModel jcm = new JCodeModel();
