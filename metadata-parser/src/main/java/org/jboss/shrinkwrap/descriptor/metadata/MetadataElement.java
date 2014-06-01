@@ -152,4 +152,28 @@ public class MetadataElement {
     public void setUse(final String use) {
         this.use = use;
     }
+
+    public String asClassComment() {
+        final StringBuilder buf = new StringBuilder();
+        buf.append('\n');
+        buf.append("    //--------------------------------------------------------------------------||\n");
+        addToBuilder(buf, "Element Name  : ", this.getName());
+        addToBuilder(buf, "Element Type  : ", this.getType());
+        addToBuilder(buf, "Reference     : ", this.getRef());
+        addToBuilder(buf, "MappedTo      : ", this.getMappedTo());
+        addToBuilder(buf, "Is Attribute  : ", String.valueOf(this.getIsAttribute()));
+        addToBuilder(buf, "Max Occurs    : ", this.getMaxOccurs());
+        addToBuilder(buf, "Default Value : ", this.getDefaultValue());
+        addToBuilder(buf, "Use           : ", this.getUse());
+        buf.append("    //--------------------------------------------------------------------------||\n");
+        buf.append('\n');
+        return buf.toString();
+    }
+
+    private void addToBuilder(final StringBuilder builder, final String key, final String value) {
+        builder.append("    //-- ");
+        builder.append(key);
+        builder.append(value);
+        builder.append('\n');
+    }
 }

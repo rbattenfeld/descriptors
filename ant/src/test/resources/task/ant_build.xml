@@ -45,6 +45,7 @@
 		depends="test.init">
 		<metadata-parser 
 		    verbose="false" 
+			factoryContext=""
 		    classpathref="test.classes">
 			<path 
 			    pathToApi="src/main/java" 
@@ -59,7 +60,9 @@
 	<target name="test.nestedElements" description="Use with nested elements"
 		depends="test.init">
 		<metadata-parser 
-		    verbose="false" 
+		    verbose="false"
+			generateFactory="false"
+			factoryContext="kkk"
 		    classpathref="test.classes">
 			<path
 			    pathToImpl="src/main/java"
@@ -79,7 +82,9 @@
 
 	<target name="test.withAuthors" description="Use with nested elements" depends="test.init">
 		<metadata-parser 
-			    verbose="false" 
+			    verbose="false"
+			    generateFactory="false"
+			    factoryContext="kkk"
 			    classpathref="test.classes">
 			<javadocs>
 				<javadoc

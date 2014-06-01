@@ -33,13 +33,13 @@ public class MetadataFactoryBuilder {
                     && !clazz.isEnum()
                     && !isAnnotated(clazz)
                     && !clazz.getName().endsWith("Descriptor")
+                    && !clazz.getName().endsWith("Tmp")
                     && !clazz.getFullyQualifiedName().startsWith("org.jboss.shrinkwrap.descriptor.api.Factory")) {
                         factoryClasses.add(clazz.getFullyQualifiedName());
                     }
             }
         }
 
-//        final String context = CodeGen.getPascalizeCase(factoryContext);
         createFactoryApi(pathToApi, "org.jboss.shrinkwrap.descriptor.api.Factory" + factoryContext, factoryClasses);
         createFactoryImpl(pathToImpl, "org.jboss.shrinkwrap.descriptor.api.Factory" + factoryContext, "org.jboss.shrinkwrap.descriptor.impl.Factory" +  factoryContext + "Impl", factoryClasses);
     }

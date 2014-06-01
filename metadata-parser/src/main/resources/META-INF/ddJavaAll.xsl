@@ -58,7 +58,7 @@
 <!--    <xsl:include href="../lib/xdd-printElement.xsl"/>-->
    
     <xsl:template match="/">
-        <xsl:call-template name="GenerateEnums"/>
+<!--        <xsl:call-template name="GenerateEnums"/>-->
         <xsl:call-template name="GenerateCommonInterfaces"/>
         <xsl:call-template name="GenerateInterfaces"/>
         <xsl:call-template name="GenerateCommonDescriptors"/>
