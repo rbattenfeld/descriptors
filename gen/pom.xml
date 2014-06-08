@@ -983,7 +983,7 @@
 						<id>executionJavaEE7</id>
 						<phase>validate</phase>
 						<configuration>
-							<verbose>false</verbose>
+							<verbose>true</verbose>
 							<factoryContext>JavaEE</factoryContext>
 							<javadocs>
 								<javadoc>

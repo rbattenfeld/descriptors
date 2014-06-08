@@ -1,11 +1,14 @@
 package org.jboss.shrinkwrap.descriptor.metadata.codegen;
 
 import java.io.File;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.logging.Logger;
 
 import org.jboss.shrinkwrap.descriptor.impl.base.ChildNodeInitializer;
 import org.jboss.shrinkwrap.descriptor.metadata.Metadata;
+import org.jboss.shrinkwrap.descriptor.metadata.MetadataElement;
 import org.jboss.shrinkwrap.descriptor.metadata.MetadataItem;
 import org.jboss.shrinkwrap.descriptor.metadata.MetadataJavaDoc;
 import org.jboss.shrinkwrap.descriptor.metadata.MetadataParserPath;
@@ -21,6 +24,7 @@ import com.sun.codemodel.JMethod;
 import com.sun.codemodel.JMod;
 
 public class ClassBuilder {
+
     private static final Logger log = Logger.getLogger(ClassBuilder.class.getName());
 
     public void generate(final Metadata metadata, final String pathToMetadata, final List<? extends MetadataJavaDoc> javadocTags, final MetadataParserPath path) throws Exception {
@@ -52,11 +56,47 @@ public class ClassBuilder {
                addGetNode(clazz);
                addChildNodeInitializerMethods(clazz);
             }
-            AttributeBuilder.addMethods(clazz, metadataClass, className, isApi);
-            EnumBuilder.addMethods(clazz, metadata, metadataClass, className, isApi);
+
+            for (final MetadataElement element : getElementList(metadataClass, metadata)) {
+                if (element.getType().endsWith("text")) {
+                    //
+                } else if (BuilderUtil.isEmptyBooleanType(element.getType())) {
+                    //
+                } else if (BuilderUtil.isEnum(metadata, metadataClass)) {
+                    EnumBuilder.addEnumMethods(clazz, metadata, element, className, isApi);
+                } else if (BuilderUtil.isAttribute(metadata, element)) {
+                    AttributeBuilder.addAttributeMethods(clazz, element, className, isApi);
+                } else if (BuilderUtil.isDataType(metadata, element)) {
+                    DataTypeBuilder.addDataytpeMethods(clazz, metadata, element, className, isApi);
+                } else {
+                    ElementBuilder.addElementMethods(clazz, metadata, element, className, isApi);
+                }
+            }
+
             final File file = new File(path);
             jcm.build(file);
         }
+    }
+
+    private Set<MetadataElement> getElementList(final MetadataItem metadataClass, final Metadata metadata) {
+        final Set<MetadataElement> elementOrReferenceList = new HashSet<MetadataElement>();
+        if (metadataClass.getElements() != null) {
+            elementOrReferenceList.addAll(metadataClass.getElements());
+        }
+        if (metadataClass.getReferences() != null) {
+            for (final MetadataElement groupElement : metadataClass.getReferences()) {
+                final MetadataItem groupItem = BuilderUtil.findGroup(metadata, groupElement);
+                if (groupItem != null) {
+                    if ("unbounded".equals(groupElement.getMaxOccurs())) {
+                        for (final MetadataElement el : groupItem.getElements()) {
+                           el.setMaxOccurs("unbounded");
+                        }
+                    }
+                    elementOrReferenceList.addAll(groupItem.getElements());
+                }
+            }
+        }
+        return elementOrReferenceList;
     }
 
     private String getPackage(final MetadataItem metadataClass, final boolean isApi) {

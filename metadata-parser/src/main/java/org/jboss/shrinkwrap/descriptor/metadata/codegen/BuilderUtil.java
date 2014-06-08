@@ -1,8 +1,14 @@
 package org.jboss.shrinkwrap.descriptor.metadata.codegen;
 
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
+import org.jboss.shrinkwrap.descriptor.metadata.Metadata;
+import org.jboss.shrinkwrap.descriptor.metadata.MetadataElement;
+import org.jboss.shrinkwrap.descriptor.metadata.MetadataEnum;
+import org.jboss.shrinkwrap.descriptor.metadata.MetadataItem;
 
 import com.sun.codemodel.ClassType;
 import com.sun.codemodel.JClassAlreadyExistsException;
@@ -10,6 +16,37 @@ import com.sun.codemodel.JCodeModel;
 import com.sun.codemodel.JDefinedClass;
 
 public class BuilderUtil {
+    private static Set<String> emtpyBooleanSet = new HashSet<String>();
+
+    static {
+        emtpyBooleanSet.add("javaee:emptyType");
+        emtpyBooleanSet.add("javaee:ordering-othersType");
+        emtpyBooleanSet.add("javaee:facelet-taglib-extensionType");
+        emtpyBooleanSet.add("javaee:facelet-taglib-tag-behavior-extensionType");
+        emtpyBooleanSet.add("javaee:facelet-taglib-tag-component-extensionType");
+        emtpyBooleanSet.add("javaee:facelet-taglib-tag-converter-extensionType");
+        emtpyBooleanSet.add("javaee:facelet-taglib-tag-extensionType");
+        emtpyBooleanSet.add("javaee:facelet-taglib-tag-validator-extensionType");
+        emtpyBooleanSet.add("javaee:faces-config-application-extensionType");
+        emtpyBooleanSet.add("javaee:faces-config-attribute-extensionType");
+        emtpyBooleanSet.add("javaee:faces-config-behavior-extensionType");
+        emtpyBooleanSet.add("javaee:faces-config-component-extensionType");
+        emtpyBooleanSet.add("javaee:faces-config-converter-extensionType");
+        emtpyBooleanSet.add("javaee:faces-config-extensionType");
+        emtpyBooleanSet.add("javaee:faces-config-facet-extensionType");
+        emtpyBooleanSet.add("javaee:faces-config-factory-extensionType");
+        emtpyBooleanSet.add("javaee:faces-config-lifecycle-extensionType");
+        emtpyBooleanSet.add("javaee:faces-config-managed-bean-extensionType");
+        emtpyBooleanSet.add("javaee:faces-config-navigation-rule-extensionType");
+        emtpyBooleanSet.add("javaee:faces-config-null-valueType");
+        emtpyBooleanSet.add("javaee:faces-config-ordering-othersType");
+        emtpyBooleanSet.add("javaee:faces-config-property-extensionType");
+        emtpyBooleanSet.add("javaee:faces-config-render-kit-extensionType");
+        emtpyBooleanSet.add("javaee:faces-config-renderer-extensionType");
+        emtpyBooleanSet.add("javaee:faces-config-validator-extensionType");
+        emtpyBooleanSet.add("javaee:partial-response-extensionType");
+        emtpyBooleanSet.add("javaee:extensibleType");
+    }
 
     public static JDefinedClass getClass(final JCodeModel jcm, final String fqn, final boolean isApi) throws JClassAlreadyExistsException {
         if (isApi) {
@@ -42,6 +79,10 @@ public class BuilderUtil {
     }
 
     public static Class<?> getDataType(final String xsdType) {
+        if (xsdType.contains(":") && !xsdType.startsWith("xsd")) {
+            final String[] items = xsdType.split(":", -1);
+            return getDataType(items[1]);
+        }
         if (xsdType.equals("xsd:long")) { return Long.class; }
         if (xsdType.equals("xsd:decimal")) { return String.class; }
         if (xsdType.equals("xsd:integer")) { return Integer.class; }
@@ -71,4 +112,62 @@ public class BuilderUtil {
         if (xsdType.equals("String")) { return String.class; }
         else { return String.class; }
     }
+
+    public static boolean isEnum(final Metadata metadata, final MetadataItem metadataClass) {
+        for (final MetadataEnum enumElement : metadata.getEnumList()) {
+            if (enumElement.getName().equals(metadataClass.getName()) && enumElement.getNamespace().equals(metadataClass.getNamespace())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public static boolean isDataType(final Metadata metadata, final MetadataElement element) {
+        return !getDatatypeMappedTo(metadata, element).isEmpty();
+    }
+
+    public static boolean isAttribute(final Metadata metadata, final MetadataElement element) {
+        return element.getIsAttribute() && !isDataType(metadata, element);
+    }
+
+    public static String getDatatypeMappedTo(final Metadata metadata, final MetadataElement element) {
+        for (final MetadataItem datatypeItem : metadata.getDataTypeList()) {
+            final String[] items = element.getType().split(":", -1);
+            if (items.length == 2) {
+                if (datatypeItem.getName().equals(items[1]) && datatypeItem.getNamespace().equals(items[0])) {
+                    return datatypeItem.getMappedTo();
+                }
+            }
+        }
+        return "";
+    }
+
+    public static MetadataItem findClass(final Metadata metadata, final MetadataElement element) {
+        final String[] items = element.getType().split(":", -1);
+        if (items.length == 2) {
+            for (MetadataItem classType : metadata.getClassList()) {
+                if (classType.getName().equals(items[1]) && classType.getNamespace().equals(items[0])) {
+                    return classType;
+                }
+            }
+        }
+        return null;
+    }
+
+    public static MetadataItem findGroup(final Metadata metadata, final MetadataElement element) {
+        final String[] items = element.getRef().split(":", -1);
+        if (items.length == 2) {
+            for (MetadataItem classType : metadata.getGroupList()) {
+                if (classType.getName().equals(items[1]) && classType.getNamespace().equals(items[0])) {
+                    return classType;
+                }
+            }
+        }
+        return null;
+    }
+
+    public static boolean isEmptyBooleanType(final String type) {
+        return emtpyBooleanSet.contains(type);
+    }
+
 }
