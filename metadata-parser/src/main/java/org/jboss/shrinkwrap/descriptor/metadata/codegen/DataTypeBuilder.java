@@ -7,7 +7,7 @@ import com.sun.codemodel.JDefinedClass;
 
 public class DataTypeBuilder {
 
-    private static final String[] SEARCH_LIST = new String[] { "DATATYPE", "ELEMENTNAME_P", "ELEMENTNAME_O", "CLASSNAME_P" };
+    private static final String[] SEARCH_LIST = new String[] { "DATATYPE", "ELEMENTNAME_P", "ELEMENTNAME_C", "CLASSNAME_P", "ELEMENTNAME_O" };
 
     private static final String SET_DATATYPE_UNBOUNDED = "\n"
         + "     /**\n"
@@ -16,7 +16,7 @@ public class DataTypeBuilder {
         + "      * @param values list of <code>ELEMENTNAME_O</code> objects \n"
         + "      * @return the current instance of <code>CLASSNAME_P</code> \n"
         + "      */\n"
-        + "     public CLASSNAME_P ELEMENTNAME_O(DATATYPE ... values) {\n"
+        + "     public CLASSNAME_P ELEMENTNAME_C(DATATYPE ... values) {\n"
         + "        if (values != null) {\n"
         + "            for (String name: values) {\n"
         + "               getNode().createChild(\"ELEMENTNAME_O\").text(name);\n"
@@ -55,7 +55,7 @@ public class DataTypeBuilder {
         + "      * @param valueClass the value for the element <code>ELEMENTNAME_O</code> \n"
         + "      * @return the current instance of <code>CLASSNAME_P</code> \n"
         + "      */\n"
-        + "     public CLASSNAME_P ELEMENTNAME_O(DATATYPE value) {\n"
+        + "     public CLASSNAME_P ELEMENTNAME_C(DATATYPE value) {\n"
         + "         getNode().getOrCreate(\"ELEMENTNAME_O\").text(value);\n"
         + "         return this;\n"
         + "     }\n";
@@ -85,9 +85,9 @@ public class DataTypeBuilder {
         + "      * @param start the value for the element <code>ELEMENTNAME_O</code> \n"
         + "      * @return the current instance of <code>CLASSNAME_P</code> \n"
         + "      */\n"
-        + "     public CLASSNAME_P start(java.util.Date start) {\n"
-        + "         if (start != null) {\n"
-        + "             getNode().getOrCreate(\"ELEMENTNAME_O\").text(XMLDate.toXMLFormat(start));\n"
+        + "     public CLASSNAME_P ELEMENTNAME_C(java.util.Date ELEMENTNAME_C) {\n"
+        + "         if (ELEMENTNAME_C != null) {\n"
+        + "             getNode().getOrCreate(\"ELEMENTNAME_O\").text(org.jboss.shrinkwrap.descriptor.impl.base.XMLDate.toXMLFormat(ELEMENTNAME_C));\n"
         + "             return this;\n"
         + "         }\n"
         + "         return null;\n"
@@ -99,8 +99,8 @@ public class DataTypeBuilder {
         + "      * @return the node defined for the element <code>ELEMENTNAME_O</code> \n"
         + "      */\n"
         + "     public java.util.Date getELEMENTNAME_P() {\n"
-        + "         if (getNode().getTextValueForPatternName(\"ELEMENTNAME_O\") != null) {\n"
-        + "             return XMLDate.toDate(getNode().getTextValueForPatternName(\"ELEMENTNAME_O\"));\n"
+        + "         if (getNode().getTextValueForPatternName(\"ELEMENTNAME_C\") != null) {\n"
+        + "             return org.jboss.shrinkwrap.descriptor.impl.base.XMLDate.toDate(getNode().getTextValueForPatternName(\"ELEMENTNAME_O\"));\n"
         + "         }\n"
         + "         return null;\n"
         + "     }\n";
@@ -122,6 +122,18 @@ public class DataTypeBuilder {
         + "    public Integer getELEMENTNAME_P() {\n"
         + "        if (getNode().getTextValueForPatternName(\"ELEMENTNAME_O\") != null && !getNode().getTextValueForPatternName(\"ELEMENTNAME_O\").equals(\"null\")) {\n"
         + "            return Integer.valueOf(getNode().getTextValueForPatternName(\"ELEMENTNAME_O\"));\n"
+        + "        }\n"
+        + "        return null;\n"
+        + "    }\n";
+
+    private static final String GET_AS_LONG = "\n"
+        + "    /**\n"
+        + "     * Returns the <code>ELEMENTNAME_O</code> element\n"
+        + "     * @return the node defined for the element <code>ELEMENTNAME_O</code> \n"
+        + "     */\n"
+        + "    public Long getELEMENTNAME_P() {\n"
+        + "        if (getNode().getTextValueForPatternName(\"ELEMENTNAME_O\") != null && !getNode().getTextValueForPatternName(\"ELEMENTNAME_O\").equals(\"null\")) {\n"
+        + "            return Long.valueOf(getNode().getTextValueForPatternName(\"ELEMENTNAME_O\"));\n"
         + "        }\n"
         + "        return null;\n"
         + "    }\n";
@@ -156,6 +168,12 @@ public class DataTypeBuilder {
         REM_DATATYPE_SINGLE,
     };
 
+    private static final String[] METHOD_LIST_LONG_SINGLE = new String[] {
+        SET_DATATYPE_SINGLE,
+        GET_AS_LONG,
+        REM_DATATYPE_SINGLE,
+    };
+
     public static void addDataytpeMethods(final JDefinedClass clazz, final Metadata metadata, final MetadataElement element, final String className, final boolean isApi) throws Exception {
         generateImpl(clazz, className, metadata, element, isApi);
     }
@@ -165,9 +183,9 @@ public class DataTypeBuilder {
     //-----------------------------------------------------------------------||
 
     private static void generateImpl(final JDefinedClass clazz, final String className, final Metadata metadata, final MetadataElement element, final boolean isApi) throws Exception {
-        final String elementName = BuilderUtil.checkReservedWords(CodeGen.getCamelCase(element.getName()));
+        final String elementName_c = BuilderUtil.checkReservedWords(CodeGen.getCamelCase(element.getName()));
         final Class<?> dataType = BuilderUtil.getDataType(element.getType());
-        final String[] replaceList = getReplaceList(dataType, className, elementName);
+        final String[] replaceList = getReplaceList(dataType, className, elementName_c, element.getName());
         clazz.direct(element.asClassComment());
         clazz.direct("    // generated by DataTypeBuilder:" + dataType);
         if ("unbounded".equals(element.getMaxOccurs())) {
@@ -183,7 +201,11 @@ public class DataTypeBuilder {
                 for (String methodBody : METHOD_LIST_INTEGER_SINGLE) {
                     clazz.direct(BuilderUtil.replaceAll(methodBody, isApi, SEARCH_LIST, replaceList));
                 }
-            }  else if (dataType == java.util.Date.class) {
+            } else if (dataType == Long.class) {
+                for (String methodBody : METHOD_LIST_LONG_SINGLE) {
+                    clazz.direct(BuilderUtil.replaceAll(methodBody, isApi, SEARCH_LIST, replaceList));
+                }
+            } else if (dataType == java.util.Date.class) {
                 for (String methodBody : METHOD_LIST_DATE_SINGLE) {
                     clazz.direct(BuilderUtil.replaceAll(methodBody, isApi, SEARCH_LIST, replaceList));
                 }
@@ -195,8 +217,8 @@ public class DataTypeBuilder {
         }
     }
 
-    private static String[] getReplaceList(final Class<?> dataType, final String className, final String elementName) {
-        return new String[] {dataType.getSimpleName(), CodeGen.getPascalizeCase(elementName), elementName, className};
+    private static String[] getReplaceList(final Class<?> dataType, final String className, final String elementName_c, final String elementName) {
+        return new String[] {dataType.getSimpleName(), CodeGen.getPascalizeCase(elementName_c), elementName_c, className, elementName};
     }
 
 }

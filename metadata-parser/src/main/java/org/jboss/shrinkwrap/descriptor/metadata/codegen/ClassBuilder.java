@@ -59,9 +59,9 @@ public class ClassBuilder {
 
             for (final MetadataElement element : getElementList(metadataClass, metadata)) {
                 if (element.getType().endsWith("text")) {
-                    //
+                    TextTypeBuilder.addTextTypeMethods(clazz, metadata, element, className, isApi);
                 } else if (BuilderUtil.isEmptyBooleanType(element.getType())) {
-                    //
+                    BooleanTypeBuilder.addAttributeMethods(clazz, element, className, isApi);
                 } else if (BuilderUtil.isEnum(metadata, metadataClass)) {
                     EnumBuilder.addEnumMethods(clazz, metadata, element, className, isApi);
                 } else if (BuilderUtil.isAttribute(metadata, element)) {
@@ -79,24 +79,35 @@ public class ClassBuilder {
     }
 
     private Set<MetadataElement> getElementList(final MetadataItem metadataClass, final Metadata metadata) {
-        final Set<MetadataElement> elementOrReferenceList = new HashSet<MetadataElement>();
+        final Set<MetadataElement> elementList = new HashSet<MetadataElement>();
         if (metadataClass.getElements() != null) {
-            elementOrReferenceList.addAll(metadataClass.getElements());
+            elementList.addAll(metadataClass.getElements());
         }
         if (metadataClass.getReferences() != null) {
-            for (final MetadataElement groupElement : metadataClass.getReferences()) {
-                final MetadataItem groupItem = BuilderUtil.findGroup(metadata, groupElement);
-                if (groupItem != null) {
-                    if ("unbounded".equals(groupElement.getMaxOccurs())) {
-                        for (final MetadataElement el : groupItem.getElements()) {
-                           el.setMaxOccurs("unbounded");
-                        }
+            elementList.addAll(includeGroupRefs(metadataClass, metadata));
+        }
+        return elementList;
+    }
+
+    private Set<MetadataElement> includeGroupRefs(final MetadataItem metadataClass, final Metadata metadata) {
+        final Set<MetadataElement> elementList = new HashSet<MetadataElement>();
+        for (final MetadataElement groupElement : metadataClass.getReferences()) {
+            final MetadataItem groupItem = BuilderUtil.findGroup(metadata, groupElement);
+            if (groupItem != null) {
+                if ("unbounded".equals(groupElement.getMaxOccurs())) {
+                    for (final MetadataElement el : groupItem.getElements()) {
+                       el.setMaxOccurs("unbounded");
                     }
-                    elementOrReferenceList.addAll(groupItem.getElements());
+                }
+                elementList.addAll(groupItem.getElements());
+                if (groupItem.getReferences() != null) {
+                    for (final MetadataElement subGroupElement : groupItem.getReferences()) {
+                        elementList.addAll(includeGroupRefs(groupItem, metadata));
+                    }
                 }
             }
         }
-        return elementOrReferenceList;
+        return elementList;
     }
 
     private String getPackage(final MetadataItem metadataClass, final boolean isApi) {

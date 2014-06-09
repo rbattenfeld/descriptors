@@ -123,7 +123,14 @@ public class BuilderUtil {
     }
 
     public static boolean isDataType(final Metadata metadata, final MetadataElement element) {
-        return !getDatatypeMappedTo(metadata, element).isEmpty();
+        final String mappedTo = getDatatypeMappedTo(metadata, element);
+        System.out.println("elementtype: " + element.getType() + " mappedTo: " + mappedTo);
+        if (element.getType().startsWith("xsd:")) {
+            return true;
+        } else if (!mappedTo.isEmpty()) {
+            return true;
+        }
+        return false;
     }
 
     public static boolean isAttribute(final Metadata metadata, final MetadataElement element) {
@@ -131,9 +138,9 @@ public class BuilderUtil {
     }
 
     public static String getDatatypeMappedTo(final Metadata metadata, final MetadataElement element) {
-        for (final MetadataItem datatypeItem : metadata.getDataTypeList()) {
-            final String[] items = element.getType().split(":", -1);
-            if (items.length == 2) {
+        final String[] items = element.getType().split(":", -1);
+        if (items.length == 2) {
+            for (final MetadataItem datatypeItem : metadata.getDataTypeList()) {
                 if (datatypeItem.getName().equals(items[1]) && datatypeItem.getNamespace().equals(items[0])) {
                     return datatypeItem.getMappedTo();
                 }
