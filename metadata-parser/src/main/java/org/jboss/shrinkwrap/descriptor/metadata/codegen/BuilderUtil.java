@@ -177,4 +177,17 @@ public class BuilderUtil {
         return emtpyBooleanSet.contains(type);
     }
 
+    public static String getCommonPackageName(final String packageName) {
+        return packageName.replace("[0-9]+$", "");
+    }
+
+    public static String getCommonName(final String className) {
+        if (className.endsWith("Type")) {
+            return className.replace("Type", "CommonType");
+        } else if (className.endsWith("type")) {
+            return className.replace("type", "CommonType");
+        } else {
+            return className + "CommType";
+        }
+    }
 }
