@@ -1,19 +1,32 @@
 package org.jboss.shrinkwrap.descriptor.metadata.codegen;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
 import org.jboss.shrinkwrap.descriptor.metadata.Metadata;
+import org.jboss.shrinkwrap.descriptor.metadata.MetadataDescriptor;
 import org.jboss.shrinkwrap.descriptor.metadata.MetadataElement;
 import org.jboss.shrinkwrap.descriptor.metadata.MetadataEnum;
 import org.jboss.shrinkwrap.descriptor.metadata.MetadataItem;
+import org.jboss.shrinkwrap.descriptor.metadata.MetadataParserPath;
 
 import com.sun.codemodel.ClassType;
 import com.sun.codemodel.JClassAlreadyExistsException;
 import com.sun.codemodel.JCodeModel;
 import com.sun.codemodel.JDefinedClass;
+import com.thoughtworks.qdox.JavaProjectBuilder;
+import com.thoughtworks.qdox.model.JavaAnnotation;
+import com.thoughtworks.qdox.model.JavaClass;
+import com.thoughtworks.qdox.model.JavaSource;
+import com.thoughtworks.qdox.model.expression.AnnotationValue;
 
 public class BuilderUtil {
     private static Set<String> emtpyBooleanSet = new HashSet<String>();
@@ -92,6 +105,7 @@ public class BuilderUtil {
         if (xsdType.equals("xsd:positiveInteger")) { return Integer.class; }
         if (xsdType.equals("positiveInteger")) { return Integer.class; }
         if (xsdType.equals("nonNegativeInteger")) { return Integer.class; }
+        if (xsdType.equals("xsd:nonNegativeInteger")) { return Integer.class; }
         if (xsdType.equals("integer")) { return Integer.class; }
         if (xsdType.equals("int")) { return Integer.class; }
         if (xsdType.equals("xsdStringType")) { return String.class; }
@@ -113,10 +127,13 @@ public class BuilderUtil {
         else { return String.class; }
     }
 
-    public static boolean isEnum(final Metadata metadata, final MetadataItem metadataClass) {
+    public static boolean isEnum(final Metadata metadata, final MetadataElement element) {
         for (final MetadataEnum enumElement : metadata.getEnumList()) {
-            if (enumElement.getName().equals(metadataClass.getName()) && enumElement.getNamespace().equals(metadataClass.getNamespace())) {
-                return true;
+            final String[] items = element.getType().split(":", -1);
+            if (items.length == 2) {
+                if (enumElement.getName().equals(items[1]) && enumElement.getNamespace().equals(items[0])) {
+                    return true;
+                }
             }
         }
         return false;
@@ -124,7 +141,6 @@ public class BuilderUtil {
 
     public static boolean isDataType(final Metadata metadata, final MetadataElement element) {
         final String mappedTo = getDatatypeMappedTo(metadata, element);
-        System.out.println("elementtype: " + element.getType() + " mappedTo: " + mappedTo);
         if (element.getType().startsWith("xsd:")) {
             return true;
         } else if (!mappedTo.isEmpty()) {
@@ -190,4 +206,125 @@ public class BuilderUtil {
             return className + "CommType";
         }
     }
+
+    public static Map<String, List<String>> getCommonClasses(final Metadata metadata, final MetadataParserPath path) throws IOException {
+        final Map<String, List<String>> existingCommonClassMap = new HashMap<String, List<String>>();
+        final Set<String> commonPathSet = new HashSet<String>();
+        final List<File> fileList = new ArrayList<File>();
+        for (final MetadataDescriptor descr : metadata.getMetadataDescriptorList()) {
+            if (descr.getCommon() != null) {
+                final String pathTo = descr.getCommon().getPathToCommonApi();
+                final String commonApi = descr.getCommon().getCommonApi().replace('.', '/');
+                commonPathSet.add(pathTo + "/" + commonApi);
+            } else if (descr.isGenerateCommonClasses()) {
+                final String pathTo = path.getPathToApi();
+                final String commonApi = descr.getPackageApi().replaceAll("[0-9]*$", "").replace('.', '/');
+                commonPathSet.add(pathTo + "/" + commonApi);
+            }
+        }
+
+        for (final String pathCommonApi : commonPathSet) {
+            listFiles(fileList, pathCommonApi);
+        }
+
+        final JavaProjectBuilder builder = new JavaProjectBuilder();
+        for (final File file : fileList) {
+            final List<String> extendsList = new ArrayList<String>();
+            existingCommonClassMap.put(file.getName(), extendsList);
+            final JavaSource src = builder.addSource(file);
+            final JavaClass class1  = src.getClasses().get(0);
+            final List<JavaAnnotation> annotationList = class1.getAnnotations();
+            for (JavaAnnotation annotation : annotationList) {
+                final  AnnotationValue value = annotation.getProperty("common");
+                final List<String> commonExtendsList = (List<String>)value.getParameterValue();
+                for (String commonClass : commonExtendsList) {
+                    extendsList.add(commonClass.replace('"', ' ').trim());
+                }
+            }
+        }
+        return existingCommonClassMap;
+    }
+
+    private static void listFiles(final List<File> list, final String directoryName) {
+        final File directory = new File(directoryName);
+        if (directory.isDirectory()) {
+            final File[] fList = directory.listFiles();
+            for (final File file : fList) {
+                if (file.isFile()) {
+                    list.add(file);
+                } else if (file.isDirectory()) {
+                    listFiles(list, file.getAbsolutePath());
+                }
+            }
+        }
+    }
+
+    public static List<String> findCommonClasses(final Metadata metadata) {
+        final List<String> classList = new ArrayList<String>();
+        for (MetadataDescriptor descr : metadata.getMetadataDescriptorList()) {
+            if (descr.getCommon() != null) {
+                traverseClasses(metadata, classList, descr.getRootElementType());
+            } else {
+                if (descr.isGenerateClasses()) {
+                    final String packageApi = descr.getPackageApi();
+                    for (MetadataItem item : metadata.getClassList()) {
+                        if (packageApi.equals(item.getPackageApi())) {
+                            final String type = item.getNamespace() + ":" + item.getName();
+                            if (!classList.contains(type)) {
+                                classList.add(type);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return classList;
+    }
+
+    private static void traverseClasses(final Metadata metadata, final List<String> classList, final String elementType) {
+        final String[] elItems = elementType.split(":", -1);
+        if (elItems.length == 2) {
+            for (MetadataItem item : metadata.getClassList()) {
+                if (item.getNamespace().equals(elItems[0]) && item.getName().equals(elItems[1])) {
+                    for (MetadataElement element : item.getElements()) {
+                        if (!isDataType(metadata, element)) {
+                            if (!classList.contains(element.getType())) {
+                                classList.add(element.getType());
+                                traverseClasses(metadata, classList, element.getType());
+                            }
+                        }
+                    }
+                    for (MetadataElement element : item.getReferences()) {
+                        if (!isDataType(metadata, element)) {
+                            if (!classList.contains(element.getRef())) {
+                                classList.add(element.getRef());
+                                traverseClasses(metadata, classList, element.getRef());
+                            }
+                        }
+                    }
+                }
+            }
+            for (MetadataItem item : metadata.getGroupList()) {
+                if (item.getNamespace().equals(elItems[0]) && item.getName().equals(elItems[1])) {
+                    for (MetadataElement element : item.getElements()) {
+                        if (!isDataType(metadata, element)) {
+                            if (!classList.contains(element.getType())) {
+                                classList.add(element.getType());
+                                traverseClasses(metadata, classList, element.getType());
+                            }
+                        }
+                    }
+                    for (MetadataElement element : item.getReferences()) {
+                        if (!isDataType(metadata, element)) {
+                            if (!classList.contains(element.getRef())) {
+                                classList.add(element.getRef());
+                                traverseClasses(metadata, classList, element.getRef());
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
 }

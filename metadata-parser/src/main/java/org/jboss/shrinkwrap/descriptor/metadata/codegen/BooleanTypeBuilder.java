@@ -1,10 +1,11 @@
 package org.jboss.shrinkwrap.descriptor.metadata.codegen;
 
+import org.jboss.shrinkwrap.descriptor.metadata.Metadata;
 import org.jboss.shrinkwrap.descriptor.metadata.MetadataElement;
 
 import com.sun.codemodel.JDefinedClass;
 
-public class BooleanTypeBuilder {
+public class BooleanTypeBuilder implements MethodGeneratorContract {
 
     private static final String[] SEARCH_LIST = new String[] { "DATATYPE", "ELEMENTNAME_P", "ELEMENTNAME_C", "CLASSNAME_P", "ELEMENTNAME_O" };
 
@@ -44,15 +45,20 @@ public class BooleanTypeBuilder {
         REM_EMTPY_BOOLEAN_TYPE,
     };
 
-    public static void addAttributeMethods(final JDefinedClass clazz, final MetadataElement element, final String className, final boolean isApi) throws Exception {
-        generateImpl(clazz, className, element, isApi);
+    @Override
+    public boolean addMethods(final JDefinedClass clazz, final  Metadata metadata, final MetadataElement element, final String className, final boolean isApi) throws Exception {
+        if (BuilderUtil.isEmptyBooleanType(element.getType())) {
+            generateImpl(clazz, className, element, isApi);
+            return true;
+        }
+        return false;
     }
 
     //-----------------------------------------------------------------------||
     //--Private Methods -----------------------------------------------------||
     //-----------------------------------------------------------------------||
 
-    private static void generateImpl(final JDefinedClass clazz, final String className, final MetadataElement element, final boolean isApi) throws Exception {
+    private void generateImpl(final JDefinedClass clazz, final String className, final MetadataElement element, final boolean isApi) throws Exception {
         if (element.getIsAttribute()) {
             final String elementName_c = BuilderUtil.checkReservedWords(CodeGen.getCamelCase(element.getName()));
             final Class<?> dataType = BuilderUtil.getDataType(element.getType());
@@ -65,7 +71,7 @@ public class BooleanTypeBuilder {
         }
     }
 
-    private static String[] getReplaceList(final Class<?> dataType, final String className, final String elementName_c, final String elementName) {
+    private String[] getReplaceList(final Class<?> dataType, final String className, final String elementName_c, final String elementName) {
         return new String[] {dataType.getSimpleName(), CodeGen.getPascalizeCase(elementName), elementName_c, className, elementName};
     }
 

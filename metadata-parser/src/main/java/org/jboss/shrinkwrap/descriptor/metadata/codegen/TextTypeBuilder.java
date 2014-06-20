@@ -5,7 +5,7 @@ import org.jboss.shrinkwrap.descriptor.metadata.MetadataElement;
 
 import com.sun.codemodel.JDefinedClass;
 
-public class TextTypeBuilder {
+public class TextTypeBuilder implements MethodGeneratorContract {
 
     private static final String[] SEARCH_LIST = new String[] { "DATATYPE", "ELEMENTNAME_P", "ELEMENTNAME_O", "CLASSNAME_P" };
 
@@ -34,15 +34,20 @@ public class TextTypeBuilder {
         GET_TEXT_TYPE,
     };
 
-    public static void addTextTypeMethods(final JDefinedClass clazz, final Metadata metadata, final MetadataElement element, final String className, final boolean isApi) throws Exception {
-        generateImpl(clazz, className, metadata, element, isApi);
+    @Override
+    public boolean addMethods(final JDefinedClass clazz, final  Metadata metadata, final MetadataElement element, final String className, final boolean isApi) throws Exception {
+        if (element.getType().endsWith("text")) {
+            generateImpl(clazz, className, metadata, element, isApi);
+            return true;
+        }
+        return false;
     }
 
     //-----------------------------------------------------------------------||
     //--Private Methods -----------------------------------------------------||
     //-----------------------------------------------------------------------||
 
-    private static void generateImpl(final JDefinedClass clazz, final String className, final Metadata metadata, final MetadataElement element, final boolean isApi) throws Exception {
+    private void generateImpl(final JDefinedClass clazz, final String className, final Metadata metadata, final MetadataElement element, final boolean isApi) throws Exception {
         final String elementName = BuilderUtil.checkReservedWords(CodeGen.getCamelCase(element.getName()));
         final Class<?> dataType = BuilderUtil.getDataType(element.getType());
         final String[] replaceList = getReplaceList(dataType, className, elementName);
@@ -53,7 +58,7 @@ public class TextTypeBuilder {
         }
     }
 
-    private static String[] getReplaceList(final Class<?> dataType, final String className, final String elementName) {
+    private String[] getReplaceList(final Class<?> dataType, final String className, final String elementName) {
         return new String[] {dataType.getSimpleName(), CodeGen.getPascalizeCase(elementName), elementName, className};
     }
 

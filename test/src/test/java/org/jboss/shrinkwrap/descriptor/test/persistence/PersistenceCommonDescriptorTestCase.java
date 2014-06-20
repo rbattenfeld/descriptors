@@ -1,9 +1,9 @@
 package org.jboss.shrinkwrap.descriptor.test.persistence;
 
-import org.jboss.shrinkwrap.descriptor.api.Descriptors;
-
-import org.jboss.shrinkwrap.descriptor.api.persistence.PersistenceCommonDescriptor;
-import org.jboss.shrinkwrap.descriptor.api.persistence10.PersistenceDescriptor;
+//import org.jboss.shrinkwrap.descriptor.api.Descriptors;
+//
+//import org.jboss.shrinkwrap.descriptor.api.persistence.PersistenceCommonDescriptor;
+//import org.jboss.shrinkwrap.descriptor.api.persistence10.PersistenceDescriptor;
 import org.junit.Ignore;
 import org.junit.Test;
 @Ignore // TODO active later when refactoring is completed
@@ -53,7 +53,7 @@ public class PersistenceCommonDescriptorTestCase {
     // Internal Helper ---------------------------------------------------------------------||
     // -------------------------------------------------------------------------------------||
     
-    private PersistenceCommonDescriptor create() {
-        return Descriptors.create(PersistenceDescriptor.class);
-    }
+//    private PersistenceCommonDescriptor create() {
+//        return Descriptors.create(PersistenceDescriptor.class);
+//    }
 }

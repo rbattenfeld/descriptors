@@ -5,7 +5,7 @@ import org.jboss.shrinkwrap.descriptor.metadata.MetadataElement;
 
 import com.sun.codemodel.JDefinedClass;
 
-public class DataTypeBuilder {
+public class DataTypeBuilder implements MethodGeneratorContract {
 
     private static final String[] SEARCH_LIST = new String[] { "DATATYPE", "ELEMENTNAME_P", "ELEMENTNAME_C", "CLASSNAME_P", "ELEMENTNAME_O" };
 
@@ -174,8 +174,13 @@ public class DataTypeBuilder {
         REM_DATATYPE_SINGLE,
     };
 
-    public static void addDataytpeMethods(final JDefinedClass clazz, final Metadata metadata, final MetadataElement element, final String className, final boolean isApi) throws Exception {
-        generateImpl(clazz, className, metadata, element, isApi);
+    @Override
+    public boolean addMethods(final JDefinedClass clazz, final  Metadata metadata, final MetadataElement element, final String className, final boolean isApi) throws Exception {
+        if (BuilderUtil.isDataType(metadata, element)) {
+            generateImpl(clazz, className, metadata, element, isApi);
+            return true;
+        }
+        return false;
     }
 
     //-----------------------------------------------------------------------||

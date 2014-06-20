@@ -1,16 +1,12 @@
 package org.jboss.shrinkwrap.descriptor.metadata.codegen;
 
-import java.util.logging.Logger;
-
 import org.jboss.shrinkwrap.descriptor.metadata.Metadata;
 import org.jboss.shrinkwrap.descriptor.metadata.MetadataElement;
 import org.jboss.shrinkwrap.descriptor.metadata.MetadataItem;
 
 import com.sun.codemodel.JDefinedClass;
 
-public class ElementBuilder {
-
-    private static final Logger log = Logger.getLogger(ElementBuilder.class.getName());
+public class ElementBuilder implements MethodGeneratorContract {
 
     private static final String[] SEARCH_LIST = new String[] { "DATATYPE", "ELEMENTNAME_P", "ELEMENTNAME_C", "CLASSNAME_P", "ELEMENTNAME_O", "ELEMENTTYPE_P", "ELEMENTTYPE_IMPL_P" };
 
@@ -122,19 +118,21 @@ public class ElementBuilder {
         METHOD_REM_SINGLE_ELEMENT,
     };
 
-    public static void addElementMethods(final JDefinedClass clazz, final Metadata metadata, final MetadataElement element, final String className, final boolean isApi) throws Exception {
+    @Override
+    public boolean addMethods(final JDefinedClass clazz, final  Metadata metadata, final MetadataElement element, final String className, final boolean isApi) throws Exception {
         if ("unbounded".equals(element.getMaxOccurs())) {
             generateUnboundedElementMethods(clazz, className, metadata, element, isApi);
         } else {
             generateSingleElementMethods(clazz, className, metadata, element, isApi);
         }
+        return true;
     }
 
     //-----------------------------------------------------------------------||
     //--Private Methods -----------------------------------------------------||
     //-----------------------------------------------------------------------||
 
-    private static void generateSingleElementMethods(final JDefinedClass clazz, final String className, final Metadata metadata, final MetadataElement element, final boolean isApi) throws Exception {
+    private void generateSingleElementMethods(final JDefinedClass clazz, final String className, final Metadata metadata, final MetadataElement element, final boolean isApi) throws Exception {
         final MetadataItem classType = BuilderUtil.findClass(metadata, element);
         if (classType != null) {
             final String elementName = BuilderUtil.checkReservedWords(CodeGen.getCamelCase(element.getName()));
@@ -154,7 +152,7 @@ public class ElementBuilder {
         }
     }
 
-    private static void generateUnboundedElementMethods(final JDefinedClass clazz, final String className, final Metadata metadata, final MetadataElement element, final boolean isApi) throws Exception {
+    private void generateUnboundedElementMethods(final JDefinedClass clazz, final String className, final Metadata metadata, final MetadataElement element, final boolean isApi) throws Exception {
         final MetadataItem classType = BuilderUtil.findClass(metadata, element);
         if (classType != null) {
             final String elementName = BuilderUtil.checkReservedWords(CodeGen.getCamelCase(element.getName()));
@@ -168,7 +166,7 @@ public class ElementBuilder {
         }
     }
 
-    private static String[] getReplaceList(final Class<?> dataType, final String className, final String elementNameCamelCase, final String elementName, final String elementType, final MetadataItem classType) {
+    private String[] getReplaceList(final Class<?> dataType, final String className, final String elementNameCamelCase, final String elementName, final String elementType, final MetadataItem classType) {
         final String[] items = elementType.split(":", -1);
         return new String[] {
             dataType.getSimpleName(),

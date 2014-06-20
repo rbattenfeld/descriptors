@@ -1,14 +1,11 @@
 package org.jboss.shrinkwrap.descriptor.metadata.codegen;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import org.jboss.shrinkwrap.descriptor.metadata.Metadata;
 import org.jboss.shrinkwrap.descriptor.metadata.MetadataElement;
-import org.jboss.shrinkwrap.descriptor.metadata.MetadataItem;
 
 import com.sun.codemodel.JDefinedClass;
 
-public class AttributeBuilder {
+public class AttributeBuilder implements MethodGeneratorContract {
 
     private static final String[] SEARCH_LIST = new String[] { "DATATYPE", "ELEMENTNAME_P", "ELEMENTNAME_C", "CLASSNAME_P" };
 
@@ -81,15 +78,20 @@ public class AttributeBuilder {
         REM_WITH_DATATYPE,
     };
 
-    public static void addAttributeMethods(final JDefinedClass clazz, final MetadataElement element, final String className, final boolean isApi) throws Exception {
-        generateImpl(clazz, className, element, isApi);
+    @Override
+    public boolean addMethods(final JDefinedClass clazz, final  Metadata metadata, final MetadataElement element, final String className, final boolean isApi) throws Exception {
+        if (BuilderUtil.isAttribute(metadata, element)) {
+            generateImpl(clazz, className, element, isApi);
+            return true;
+        }
+        return false;
     }
 
     //-----------------------------------------------------------------------||
     //--Private Methods -----------------------------------------------------||
     //-----------------------------------------------------------------------||
 
-    private static void generateImpl(final JDefinedClass clazz, final String className, final MetadataElement element, final boolean isApi) throws Exception {
+    private void generateImpl(final JDefinedClass clazz, final String className, final MetadataElement element, final boolean isApi) throws Exception {
         if (element.getIsAttribute()) {
             final String elementName = BuilderUtil.checkReservedWords(CodeGen.getCamelCase(element.getName()));
             final Class<?> dataType = BuilderUtil.getDataType(element.getType());
@@ -112,7 +114,7 @@ public class AttributeBuilder {
         }
     }
 
-    private static String[] getReplaceList(final Class<?> dataType, final String className, final String elementName) {
+    private String[] getReplaceList(final Class<?> dataType, final String className, final String elementName) {
         return new String[] {dataType.getSimpleName(), CodeGen.getPascalizeCase(elementName), elementName, className};
     }
 

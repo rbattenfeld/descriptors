@@ -59,12 +59,12 @@
    
     <xsl:template match="/">
 <!--        <xsl:call-template name="GenerateEnums"/>-->
-        <xsl:call-template name="GenerateCommonInterfaces"/>
-        <xsl:call-template name="GenerateInterfaces"/>
-        <xsl:call-template name="GenerateCommonDescriptors"/>
+<!--        <xsl:call-template name="GenerateCommonInterfaces"/>-->
+<!--        <xsl:call-template name="GenerateInterfaces"/>-->
+<!--        <xsl:call-template name="GenerateCommonDescriptors"/>-->
         <xsl:call-template name="GenerateDescriptors"/>
         <xsl:call-template name="GenerateDescriptorsImpl"/>
-        <xsl:call-template name="GenerateImplClasses"/>
+<!--        <xsl:call-template name="GenerateImplClasses"/>-->
         <xsl:call-template name="GenerateTestClasses"/>
         <xsl:call-template name="GeneratePackageInfos"/>
         <xsl:call-template name="GenerateServiceFiles"/>
@@ -298,6 +298,7 @@
                 
                 <xsl:choose>
                     <xsl:when test="exists(//generatedClass[@name=$vCommonJavaName])">
+                        <xsl:message select="$vCommonJavaName"></xsl:message>
                         <xsl:value-of select="concat('import ', //generatedClass[@name=$vCommonJavaName]/@commonPackage, '.', $vCommonName, ';&#10;')"/>
                         <xsl:for-each select="//generatedClass[@name=$vCommonJavaName]/commonExtends">
                               <xsl:if test="@extends != 'dummy'">
