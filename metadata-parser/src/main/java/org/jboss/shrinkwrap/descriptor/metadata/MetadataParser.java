@@ -32,6 +32,8 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.transform.TransformerException;
 
 import org.jboss.shrinkwrap.descriptor.metadata.codegen.ClassBuilder;
+import org.jboss.shrinkwrap.descriptor.metadata.codegen.DescriptorBuilder;
+import org.jboss.shrinkwrap.descriptor.metadata.codegen.EnumBuilder;
 import org.jboss.shrinkwrap.descriptor.metadata.dom.DomWriter;
 import org.jboss.shrinkwrap.descriptor.metadata.dtd.MetadataDtdEventListener;
 import org.jboss.shrinkwrap.descriptor.metadata.xslt.XsltTransformer;
@@ -164,7 +166,9 @@ public class MetadataParser {
         if (path.getPathToApi() != null && path.getPathToImpl() != null) {
             generateCode(path, verbose, factoryContext);
             PackageInfo.copyPackageInfo(path, metadata, verbose);
+            new EnumBuilder().generate(metadata, pathToMetadata, (List<MetadataJavaDoc>) javadocTags, path);
             new ClassBuilder().generate(metadata, pathToMetadata, (List<MetadataJavaDoc>) javadocTags, path);
+            new DescriptorBuilder().generate(metadata, pathToMetadata, (List<MetadataJavaDoc>) javadocTags, path, factoryContext);
             if (generateFactory && factoryContext != null) {
                 new MetadataFactoryBuilder().createFactory(path.pathToApi, path.pathToImpl, factoryContext);
             }

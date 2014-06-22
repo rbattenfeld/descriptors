@@ -2,15 +2,11 @@ package org.jboss.shrinkwrap.descriptor.metadata.codegen;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-import java.util.logging.Logger;
 
 import org.jboss.shrinkwrap.descriptor.impl.base.ChildNodeInitializer;
 import org.jboss.shrinkwrap.descriptor.metadata.Metadata;
-import org.jboss.shrinkwrap.descriptor.metadata.MetadataDescriptor;
 import org.jboss.shrinkwrap.descriptor.metadata.MetadataElement;
 import org.jboss.shrinkwrap.descriptor.metadata.MetadataItem;
 import org.jboss.shrinkwrap.descriptor.metadata.MetadataJavaDoc;
@@ -28,11 +24,10 @@ import com.sun.codemodel.JMod;
 
 public class ClassBuilder {
 
-    private static final Logger log = Logger.getLogger(ClassBuilder.class.getName());
-
     public void generate(final Metadata metadata, final String pathToMetadata, final List<? extends MetadataJavaDoc> javadocTags, final MetadataParserPath path) throws Exception {
-        generateClasses(metadata, CommonClassesUtil.INSTANCE.getCommonClasses(metadata, path), path.getPathToApi(), true);
-        generateClasses(metadata, CommonClassesUtil.INSTANCE.getCommonClasses(metadata, path), path.getPathToImpl(), false);
+        for (Boolean isInterface : new Boolean[] { true, false }) {
+            generateClasses(metadata, CommonClassesUtil.INSTANCE.getCommonClasses(metadata, path), BuilderUtil.getPath(path, isInterface), isInterface);
+        }
     }
 
     //-----------------------------------------------------------------------||
@@ -40,16 +35,15 @@ public class ClassBuilder {
     //-----------------------------------------------------------------------||
 
     private void generateClasses(final Metadata metadata, final Map<String, CommonClassItem> commonClassesMap, final String path, final boolean isApi) throws Exception {
-        EnumBuilder.createEnums(metadata, path, isApi);
         for (final MetadataItem metadataClass : metadata.getClassList()) {
-            if (isDescriptorRootElement(metadata, metadataClass) || !isGenerateClasses(metadata, metadataClass)) {
+            if (BuilderUtil.isDescriptorRootElement(metadata, metadataClass) || !BuilderUtil.isGenerateClasses(metadata, metadataClass)) {
                 continue;
             } else if (metadataClass.getElements().size() == 1 && metadataClass.getElements().get(0).getType().equals("xsd:ID")) {
                 continue;
             }
-            final String classNameTmp = getClassName(metadataClass, isApi);
-            final String className = getClassName(metadataClass, isApi); // getRealClassName(metadataClass, isApi);
-            final String fullyQualifiedFactoryName = getPackage(metadataClass, isApi) + "." + classNameTmp;
+            final String classNameTmp = BuilderUtil.getClassName(metadataClass, isApi);
+            final String className = BuilderUtil.getClassName(metadataClass, isApi); // getRealClassName(metadataClass, isApi);
+            final String fullyQualifiedFactoryName = BuilderUtil.getPackage(metadataClass, isApi) + "." + classNameTmp;
             final JCodeModel jcm = new JCodeModel();
             final JDefinedClass clazz = BuilderUtil.getClass(jcm, fullyQualifiedFactoryName, isApi);
             if (isApi) {
@@ -67,7 +61,7 @@ public class ClassBuilder {
 //                    clazz.direct("// extends: " + commonPackageName + "  " + commonClazz.toString() + "\n");
 //                }
             } else {
-                final String fqnApi = getPackage(metadataClass, true) + "." + getClassName(metadataClass, true);
+                final String fqnApi = BuilderUtil.getPackage(metadataClass, true) + "." + BuilderUtil.getClassName(metadataClass, true);
                 final JClass apiClass = jcm.directClass(fqnApi);
                 clazz._implements(apiClass);
                 clazz._implements(ChildNodeInitializer.class);
@@ -79,29 +73,12 @@ public class ClassBuilder {
                 addChildNodeInitializerMethods(clazz);
             }
 
-            for (final MetadataElement element : getElementList(metadataClass, metadata)) {
-                clazz.direct(element.asClassComment());
-                for (MethodGeneratorContract methodGenerator : getMethodGenerators()) {
+            for (final MetadataElement element : BuilderUtil.getElementList(metadataClass, metadata)) {
+                for (MethodGeneratorContract methodGenerator : BuilderUtil.getMethodGenerators()) {
                     if (methodGenerator.addMethods(clazz, metadata, element, className, isApi)) {
                         break;
                     }
                 }
-//
-//
-//                clazz.direct("// isEnum: " + BuilderUtil.isEnum(metadata, element));
-//                if (element.getType().endsWith("text")) {
-//                    TextTypeBuilder.addTextTypeMethods(clazz, metadata, element, className, isApi);
-//                } else if (BuilderUtil.isEmptyBooleanType(element.getType())) {
-//                    BooleanTypeBuilder.addAttributeMethods(clazz, element, className, isApi);
-//                } else if (BuilderUtil.isEnum(metadata, element)) {
-//                    EnumBuilder.addEnumMethods(clazz, metadata, element, className, isApi);
-//                } else if (BuilderUtil.isAttribute(metadata, element)) {
-//                    AttributeBuilder.addAttributeMethods(clazz, element, className, isApi);
-//                } else if (BuilderUtil.isDataType(metadata, element)) {
-//                    DataTypeBuilder.addDataytpeMethods(clazz, metadata, element, className, isApi);
-//                } else {
-//                    ElementBuilder.addElementMethods(clazz, metadata, element, className, isApi);
-//                }
             }
 
             final File file = new File(path);
@@ -109,62 +86,62 @@ public class ClassBuilder {
         }
     }
 
-    private Set<MetadataElement> getElementList(final MetadataItem metadataClass, final Metadata metadata) {
-        final Set<MetadataElement> elementList = new HashSet<MetadataElement>();
-        if (metadataClass.getElements() != null) {
-            elementList.addAll(metadataClass.getElements());
-        }
-        if (metadataClass.getReferences() != null) {
-            elementList.addAll(includeGroupRefs(metadataClass, metadata));
-        }
-        return elementList;
-    }
+//    private Set<MetadataElement> getElementList(final MetadataItem metadataClass, final Metadata metadata) {
+//        final Set<MetadataElement> elementList = new HashSet<MetadataElement>();
+//        if (metadataClass.getElements() != null) {
+//            elementList.addAll(metadataClass.getElements());
+//        }
+//        if (metadataClass.getReferences() != null) {
+//            elementList.addAll(includeGroupRefs(metadataClass, metadata));
+//        }
+//        return elementList;
+//    }
+//
+//    private Set<MetadataElement> includeGroupRefs(final MetadataItem metadataClass, final Metadata metadata) {
+//        final Set<MetadataElement> elementList = new HashSet<MetadataElement>();
+//        for (final MetadataElement groupElement : metadataClass.getReferences()) {
+//            final MetadataItem groupItem = BuilderUtil.findGroup(metadata, groupElement);
+//            if (groupItem != null) {
+//                if ("unbounded".equals(groupElement.getMaxOccurs())) {
+//                    for (final MetadataElement el : groupItem.getElements()) {
+//                       el.setMaxOccurs("unbounded");
+//                    }
+//                }
+//                elementList.addAll(groupItem.getElements());
+//                if (groupItem.getReferences() != null) {
+//                    for (final MetadataElement subGroupElement : groupItem.getReferences()) {
+//                        elementList.addAll(includeGroupRefs(groupItem, metadata));
+//                    }
+//                }
+//            }
+//        }
+//        return elementList;
+//    }
 
-    private Set<MetadataElement> includeGroupRefs(final MetadataItem metadataClass, final Metadata metadata) {
-        final Set<MetadataElement> elementList = new HashSet<MetadataElement>();
-        for (final MetadataElement groupElement : metadataClass.getReferences()) {
-            final MetadataItem groupItem = BuilderUtil.findGroup(metadata, groupElement);
-            if (groupItem != null) {
-                if ("unbounded".equals(groupElement.getMaxOccurs())) {
-                    for (final MetadataElement el : groupItem.getElements()) {
-                       el.setMaxOccurs("unbounded");
-                    }
-                }
-                elementList.addAll(groupItem.getElements());
-                if (groupItem.getReferences() != null) {
-                    for (final MetadataElement subGroupElement : groupItem.getReferences()) {
-                        elementList.addAll(includeGroupRefs(groupItem, metadata));
-                    }
-                }
-            }
-        }
-        return elementList;
-    }
+//    private String getPackage(final BaseMetadataItem metadataItem, final boolean isApi) {
+//        if (isApi) {
+//            return metadataItem.getPackageApi();
+//        } else {
+//            return metadataItem.getPackageImpl();
+//        }
+//    }
 
-    private String getPackage(final MetadataItem metadataClass, final boolean isApi) {
-        if (isApi) {
-            return metadataClass.getPackageApi();
-        } else {
-            return metadataClass.getPackageImpl();
-        }
-    }
-
-    private String getClassName(final MetadataItem metadataClass, final boolean isApi) {
-        return getRealClassName(metadataClass, isApi);
+//    private String getClassName(final BaseMetadataItem metadataItem, final boolean isApi) {
+//        return getRealClassName(metadataItem, isApi);
 //        if (isApi) {
 //            return CodeGen.getPascalizeCase(metadataClass.getName() + "Tmp");
 //        } else {
 //            return CodeGen.getPascalizeCase(metadataClass.getName() + "ImplTmp");
 //        }
-    }
+//    }
 
-    private String getRealClassName(final MetadataItem metadataClass, final boolean isApi) {
-        if (isApi) {
-            return CodeGen.getPascalizeCase(metadataClass.getName());
-        } else {
-            return CodeGen.getPascalizeCase(metadataClass.getName() + "Impl");
-        }
-    }
+//    private String getRealClassName(final BaseMetadataItem metadataItem, final boolean isApi) {
+//        if (isApi) {
+//            return CodeGen.getPascalizeCase(metadataItem.getName());
+//        } else {
+//            return CodeGen.getPascalizeCase(metadataItem.getName() + "Impl");
+//        }
+//    }
 
     private void addConstructors(final JDefinedClass clazz) {
         clazz.constructor(JMod.PUBLIC);
@@ -223,49 +200,56 @@ public class ClassBuilder {
         return narrowList;
     }
 
-    private boolean isDescriptorRootElement(final Metadata metadata, final MetadataItem metadataClass) {
-        final String typeName = metadataClass.getNamespace() + ":" + metadataClass.getName();
-        for (final MetadataDescriptor descriptor : metadata.getMetadataDescriptorList()) {
-            if (typeName.equals(descriptor.getRootElementType()) && !typeName.equals("javaee:uicomponent-attributeType")) {
-                return true;
-            }
-        }
-        return false;
-    }
+//    private boolean isDescriptorRootElement(final Metadata metadata, final MetadataItem metadataClass) {
+//        final String typeName = metadataClass.getNamespace() + ":" + metadataClass.getName();
+//        for (final MetadataDescriptor descriptor : metadata.getMetadataDescriptorList()) {
+//            if (typeName.equals(descriptor.getRootElementType()) && !typeName.equals("javaee:uicomponent-attributeType")) {
+//                return true;
+//            }
+//        }
+//        return false;
+//    }
+//
+//    private boolean isGenerateClasses(final Metadata metadata, final MetadataItem metadataClass) {
+//        for (final MetadataDescriptor descriptor : metadata.getMetadataDescriptorList()) {
+//            if (descriptor.getPackageApi().equals(metadataClass.getPackageApi())) {
+//                return descriptor.isGenerateClasses();
+//            }
+//        }
+//        return false;
+//    }
+//
+//    private String getCommonNamespace(final Metadata metadata, final MetadataItem metadataClass) {
+//        final String commonPackage = metadataClass.getPackageApi().replaceAll("[0-9]*$", "");
+//        for (final MetadataDescriptor descriptor : metadata.getMetadataDescriptorList()) {
+//            if (descriptor.getCommon() != null) {
+//                if (commonPackage.equals(descriptor.getCommon().getCommonNamespace())) {
+//                    return descriptor.getCommon().getCommonNamespace();
+//                }
+//            }
+//        }
+//        return metadataClass.getNamespace();
+//    }
 
-    private boolean isGenerateClasses(final Metadata metadata, final MetadataItem metadataClass) {
-        for (final MetadataDescriptor descriptor : metadata.getMetadataDescriptorList()) {
-            if (descriptor.getPackageApi().equals(metadataClass.getPackageApi())) {
-                return descriptor.isGenerateClasses();
-            }
-        }
-        return false;
-    }
-
-    private String getCommonNamespace(final Metadata metadata, final MetadataItem metadataClass) {
-        final String commonPackage = metadataClass.getPackageApi().replaceAll("[0-9]*$", "");
-        for (final MetadataDescriptor descriptor : metadata.getMetadataDescriptorList()) {
-            if (descriptor.getCommon() != null) {
-                if (commonPackage.equals(descriptor.getCommon().getCommonNamespace())) {
-                    return descriptor.getCommon().getCommonNamespace();
-                }
-            }
-        }
-        return metadataClass.getNamespace();
-    }
-
-    /**
-     * Returns a list of <code>MethodGeneratorContract</code>. Please don't change the order!
-     * @return
-     */
-    private List<MethodGeneratorContract> getMethodGenerators() {
-        final List<MethodGeneratorContract> generatorList = new ArrayList<MethodGeneratorContract>();
-        generatorList.add(new TextTypeBuilder());
-        generatorList.add(new BooleanTypeBuilder());
-        generatorList.add(new EnumBuilder());
-        generatorList.add(new AttributeBuilder());
-        generatorList.add(new DataTypeBuilder());
-        generatorList.add(new ElementBuilder());
-        return generatorList;
-    }
+//    /**
+//     * Returns a list of <code>MethodGeneratorContract</code>. Please don't change the order!
+//     * @return
+//     */
+//    private List<MethodGeneratorContract> getMethodGenerators() {
+//        final List<MethodGeneratorContract> generatorList = new ArrayList<MethodGeneratorContract>();
+//        generatorList.add(new TextTypeBuilder());
+//        generatorList.add(new BooleanTypeBuilder());
+//        generatorList.add(new EnumBuilder());
+//        generatorList.add(new AttributeBuilder());
+//        generatorList.add(new DataTypeBuilder());
+//        generatorList.add(new ElementBuilder());
+//        return generatorList;
+//    }
+//
+//    private String getPath(final MetadataParserPath path, final boolean isApi) {
+//        if (isApi) {
+//            return path.getPathToApi();
+//        }
+//        return path.getPathToImpl();
+//    }
 }

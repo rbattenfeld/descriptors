@@ -1,11 +1,14 @@
 package org.jboss.shrinkwrap.descriptor.metadata.codegen;
 
 import java.io.File;
+import java.util.List;
 import java.util.logging.Logger;
 
 import org.jboss.shrinkwrap.descriptor.metadata.Metadata;
 import org.jboss.shrinkwrap.descriptor.metadata.MetadataElement;
 import org.jboss.shrinkwrap.descriptor.metadata.MetadataEnum;
+import org.jboss.shrinkwrap.descriptor.metadata.MetadataJavaDoc;
+import org.jboss.shrinkwrap.descriptor.metadata.MetadataParserPath;
 
 import com.sun.codemodel.ClassType;
 import com.sun.codemodel.JCodeModel;
@@ -87,6 +90,10 @@ public class EnumBuilder implements MethodGeneratorContract {
         METHOD_GET_AS_ENUM_STRING,
         METHOD_REM_AS_ENUM_TYPE};
 
+    public void generate(final Metadata metadata, final String pathToMetadata, final List<? extends MetadataJavaDoc> javadocTags, final MetadataParserPath path) throws Exception {
+        generateEnums(metadata, path.getPathToApi(), true);
+    }
+
     @Override
     public boolean addMethods(final JDefinedClass clazz, final  Metadata metadata, final MetadataElement element, final String className, final boolean isApi) throws Exception {
         if (BuilderUtil.isEnum(metadata, element)) {
@@ -128,6 +135,10 @@ public class EnumBuilder implements MethodGeneratorContract {
     //-----------------------------------------------------------------------||
     //--Private Methods -----------------------------------------------------||
     //-----------------------------------------------------------------------||
+
+    private void generateEnums(final Metadata metadata, final String path, final boolean isApi) throws Exception {
+        EnumBuilder.createEnums(metadata, path, isApi);
+    }
 
     private MetadataEnum getEnum(final Metadata metadata, final MetadataElement element) {
         final String[] items = element.getType().split(":", -1);

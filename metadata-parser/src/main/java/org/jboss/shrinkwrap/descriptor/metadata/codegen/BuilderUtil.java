@@ -11,6 +11,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
+import org.jboss.shrinkwrap.descriptor.metadata.BaseMetadataItem;
 import org.jboss.shrinkwrap.descriptor.metadata.Metadata;
 import org.jboss.shrinkwrap.descriptor.metadata.MetadataDescriptor;
 import org.jboss.shrinkwrap.descriptor.metadata.MetadataElement;
@@ -165,13 +166,26 @@ public class BuilderUtil {
         return "";
     }
 
+    public static MetadataItem findClass(final Metadata metadata, final String type) {
+        final String[] items = type.split(":", -1);
+        if (items.length == 2) {
+            return findClass(metadata, items[0], items[1]);
+        }
+        return null;
+    }
+
     public static MetadataItem findClass(final Metadata metadata, final MetadataElement element) {
         final String[] items = element.getType().split(":", -1);
         if (items.length == 2) {
-            for (MetadataItem classType : metadata.getClassList()) {
-                if (classType.getName().equals(items[1]) && classType.getNamespace().equals(items[0])) {
-                    return classType;
-                }
+            return findClass(metadata, items[0], items[1]);
+        }
+        return null;
+    }
+
+    public static MetadataItem findClass(final Metadata metadata, final String namespace, final String name) {
+        for (MetadataItem classType : metadata.getClassList()) {
+            if (classType.getName().equals(name) && classType.getNamespace().equals(namespace)) {
+                return classType;
             }
         }
         return null;
@@ -204,6 +218,22 @@ public class BuilderUtil {
             return className.replace("type", "CommonType");
         } else {
             return className + "CommType";
+        }
+    }
+
+    public static String getClassName(final BaseMetadataItem metadataItem, final boolean isApi) {
+        if (isApi) {
+            return CodeGen.getPascalizeCase(metadataItem.getName());
+        } else {
+            return CodeGen.getPascalizeCase(metadataItem.getName() + "Impl");
+        }
+    }
+
+    public static String getPackage(final BaseMetadataItem metadataItem, final boolean isApi) {
+        if (isApi) {
+            return metadataItem.getPackageApi();
+        } else {
+            return metadataItem.getPackageImpl();
         }
     }
 
@@ -327,4 +357,88 @@ public class BuilderUtil {
         }
     }
 
+    public static Set<MetadataElement> getElementList(final MetadataItem metadataClass, final Metadata metadata) {
+        final Set<MetadataElement> elementList = new HashSet<MetadataElement>();
+        if (metadataClass.getElements() != null) {
+            elementList.addAll(metadataClass.getElements());
+        }
+        if (metadataClass.getReferences() != null) {
+            elementList.addAll(includeGroupRefs(metadataClass, metadata));
+        }
+        return elementList;
+    }
+
+    public static Set<MetadataElement> includeGroupRefs(final MetadataItem metadataClass, final Metadata metadata) {
+        final Set<MetadataElement> elementList = new HashSet<MetadataElement>();
+        for (final MetadataElement groupElement : metadataClass.getReferences()) {
+            final MetadataItem groupItem = BuilderUtil.findGroup(metadata, groupElement);
+            if (groupItem != null) {
+                if ("unbounded".equals(groupElement.getMaxOccurs())) {
+                    for (final MetadataElement el : groupItem.getElements()) {
+                       el.setMaxOccurs("unbounded");
+                    }
+                }
+                elementList.addAll(groupItem.getElements());
+                if (groupItem.getReferences() != null) {
+                    for (final MetadataElement subGroupElement : groupItem.getReferences()) {
+                        elementList.addAll(includeGroupRefs(groupItem, metadata));
+                    }
+                }
+            }
+        }
+        return elementList;
+    }
+
+    /**
+     * Returns a list of <code>MethodGeneratorContract</code>. Please don't change the order!
+     * @return
+     */
+    public static List<MethodGeneratorContract> getMethodGenerators() {
+        final List<MethodGeneratorContract> generatorList = new ArrayList<MethodGeneratorContract>();
+        generatorList.add(new TextTypeBuilder());
+        generatorList.add(new BooleanTypeBuilder());
+        generatorList.add(new EnumBuilder());
+        generatorList.add(new AttributeBuilder());
+        generatorList.add(new DataTypeBuilder());
+        generatorList.add(new ElementBuilder());
+        return generatorList;
+    }
+
+    public static String getPath(final MetadataParserPath path, final boolean isApi) {
+        if (isApi) {
+            return path.getPathToApi();
+        }
+        return path.getPathToImpl();
+    }
+
+    public static boolean isDescriptorRootElement(final Metadata metadata, final MetadataItem metadataClass) {
+        final String typeName = metadataClass.getNamespace() + ":" + metadataClass.getName();
+        for (final MetadataDescriptor descriptor : metadata.getMetadataDescriptorList()) {
+            if (typeName.equals(descriptor.getRootElementType()) && !typeName.equals("javaee:uicomponent-attributeType")) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public static boolean isGenerateClasses(final Metadata metadata, final MetadataItem metadataClass) {
+        for (final MetadataDescriptor descriptor : metadata.getMetadataDescriptorList()) {
+            if (descriptor.getPackageApi().equals(metadataClass.getPackageApi())) {
+                return descriptor.isGenerateClasses();
+            }
+        }
+        return false;
+    }
+
+    public static String getCommonNamespace(final Metadata metadata, final MetadataItem metadataClass) {
+        final String commonPackage = metadataClass.getPackageApi().replaceAll("[0-9]*$", "");
+        for (final MetadataDescriptor descriptor : metadata.getMetadataDescriptorList()) {
+            if (descriptor.getCommon() != null) {
+                if (commonPackage.equals(descriptor.getCommon().getCommonNamespace())) {
+                    return descriptor.getCommon().getCommonNamespace();
+                }
+            }
+        }
+        return metadataClass.getNamespace();
+    }
 }
