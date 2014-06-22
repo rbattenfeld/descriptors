@@ -4,6 +4,8 @@ import org.jboss.shrinkwrap.descriptor.metadata.Metadata;
 import org.jboss.shrinkwrap.descriptor.metadata.MetadataElement;
 
 import com.sun.codemodel.JDefinedClass;
+import com.sun.codemodel.JExpr;
+import com.sun.codemodel.JFieldVar;
 
 public class AttributeBuilder implements MethodGeneratorContract {
 
@@ -102,13 +104,25 @@ public class AttributeBuilder implements MethodGeneratorContract {
                 for (String methodBody : METHOD_LIST_INTEGER) {
                     clazz.direct(BuilderUtil.replaceAll(methodBody, isApi, SEARCH_LIST, replaceList));
                 }
+                final JFieldVar fixedAttribute = BuilderUtil.checkFixedValue(clazz, element, elementName, Integer.class);
+                if (fixedAttribute != null) {
+                    fixedAttribute.init(JExpr.lit(Integer.parseInt(element.getFixedValue())));
+                }
             } else if (dataType == Boolean.class) {
                 for (String methodBody : METHOD_LIST_BOOLEAN) {
                     clazz.direct(BuilderUtil.replaceAll(methodBody, isApi, SEARCH_LIST, replaceList));
                 }
+                final JFieldVar fixedAttribute = BuilderUtil.checkFixedValue(clazz, element, elementName, Boolean.class);
+                if (fixedAttribute != null) {
+                    fixedAttribute.init(JExpr.lit(Boolean.parseBoolean(element.getFixedValue())));
+                }
             } else {
                 for (String methodBody : METHOD_LIST_STRING) {
                     clazz.direct(BuilderUtil.replaceAll(methodBody, isApi, SEARCH_LIST, replaceList));
+                }
+                final JFieldVar fixedAttribute = BuilderUtil.checkFixedValue(clazz, element, elementName, String.class);
+                if (fixedAttribute != null) {
+                    fixedAttribute.init(JExpr.lit(element.getFixedValue()));
                 }
             }
         }
@@ -117,5 +131,4 @@ public class AttributeBuilder implements MethodGeneratorContract {
     private String[] getReplaceList(final Class<?> dataType, final String className, final String elementName) {
         return new String[] {dataType.getSimpleName(), CodeGen.getPascalizeCase(elementName), elementName, className};
     }
-
 }

@@ -58,13 +58,13 @@
 <!--    <xsl:include href="../lib/xdd-printElement.xsl"/>-->
    
     <xsl:template match="/">
-<!--        <xsl:call-template name="GenerateEnums"/>-->
-<!--        <xsl:call-template name="GenerateCommonInterfaces"/>-->
-<!--        <xsl:call-template name="GenerateInterfaces"/>-->
-<!--        <xsl:call-template name="GenerateCommonDescriptors"/>-->
+        <xsl:call-template name="GenerateEnums"/>
+        <xsl:call-template name="GenerateCommonInterfaces"/>
+        <xsl:call-template name="GenerateInterfaces"/>
+        <xsl:call-template name="GenerateCommonDescriptors"/>
         <xsl:call-template name="GenerateDescriptors"/>
         <xsl:call-template name="GenerateDescriptorsImpl"/>
-<!--        <xsl:call-template name="GenerateImplClasses"/>-->
+        <xsl:call-template name="GenerateImplClasses"/>
         <xsl:call-template name="GenerateTestClasses"/>
         <xsl:call-template name="GeneratePackageInfos"/>
         <xsl:call-template name="GenerateServiceFiles"/>

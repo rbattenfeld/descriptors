@@ -23,6 +23,8 @@ import com.sun.codemodel.ClassType;
 import com.sun.codemodel.JClassAlreadyExistsException;
 import com.sun.codemodel.JCodeModel;
 import com.sun.codemodel.JDefinedClass;
+import com.sun.codemodel.JFieldVar;
+import com.sun.codemodel.JMod;
 import com.thoughtworks.qdox.JavaProjectBuilder;
 import com.thoughtworks.qdox.model.JavaAnnotation;
 import com.thoughtworks.qdox.model.JavaClass;
@@ -151,7 +153,7 @@ public class BuilderUtil {
     }
 
     public static boolean isAttribute(final Metadata metadata, final MetadataElement element) {
-        return element.getIsAttribute() && !isDataType(metadata, element);
+        return element.getIsAttribute(); // && !isDataType(metadata, element);
     }
 
     public static String getDatatypeMappedTo(final Metadata metadata, final MetadataElement element) {
@@ -440,5 +442,12 @@ public class BuilderUtil {
             }
         }
         return metadataClass.getNamespace();
+    }
+
+    public static JFieldVar checkFixedValue(final JDefinedClass clazz, final MetadataElement element, final String elementName, Class<?> type) {
+        if (element.getFixedValue() != null && !element.getFixedValue().isEmpty()) {
+            return clazz.field(JMod.PUBLIC | JMod.STATIC |JMod.FINAL, type, elementName.toUpperCase());
+        }
+        return null;
     }
 }

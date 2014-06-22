@@ -137,7 +137,7 @@ public class DescriptorBuilder {
     private void generateDescriptors(final Metadata metadata, final String path, final boolean isApi, final String factoryContext) throws Exception {
         for (final MetadataDescriptor descriptor : metadata.getMetadataDescriptorList()) {
             if (descriptor.getRootElementName() != null && descriptor.getRootElementType() != null) {
-                final String className = BuilderUtil.getClassName(descriptor, isApi) + "Tmp";
+                final String className = BuilderUtil.getClassName(descriptor, isApi);
                 final String fullyQualifiedFactoryName = BuilderUtil.getPackage(descriptor, isApi) + "." + className;
                 final JCodeModel jcm = new JCodeModel();
                 final JDefinedClass clazz = BuilderUtil.getClass(jcm, fullyQualifiedFactoryName, isApi);
@@ -145,18 +145,15 @@ public class DescriptorBuilder {
                     clazz._extends(Descriptor.class);
                     clazz._extends(jcm.ref(DescriptorNamespace.class).narrow(clazz));
                 } else {
-                    final String fqnApi = BuilderUtil.getPackage(descriptor, true) + "." + BuilderUtil.getClassName(descriptor, true) + "Tmp";
+                    final String fqnApi = BuilderUtil.getPackage(descriptor, true) + "." + BuilderUtil.getClassName(descriptor, true);
                     final JClass apiClass = jcm.directClass(fqnApi);
                     clazz._extends(NodeDescriptorImplBase.class);
                     clazz._implements(jcm.ref(DescriptorNamespace.class).narrow(apiClass));
                     clazz._implements(apiClass);
                     clazz.field(JMod.PRIVATE, Node.class, "model");
                     clazz.field(JMod.PRIVATE, ChildNodeInitializer.class, "dummy");
-    //                clazz.field(JMod.PRIVATE, Node.class, "detachedNode");
-    //                clazz.field(JMod.PRIVATE, boolean.class, "isDetached", JExpr.TRUE);
-                    addConstructors(clazz);
+                    addConstructors(clazz, descriptor);
                     addGetRootNode(clazz);
-    //                addChildNodeInitializerMethods(clazz);
                 }
                 final MetadataItem rootElement = BuilderUtil.findClass(metadata, descriptor.getRootElementType());
                 if (rootElement != null) {
@@ -169,7 +166,6 @@ public class DescriptorBuilder {
                         clazz.direct(BuilderUtil.replaceAll(methodBody, isApi, SEARCH_LIST, getReplaceList(className, descriptor, factoryContext)));
                     }
                     for (final MetadataElement element : BuilderUtil.getElementList(rootElement, metadata)) {
-                        clazz.direct(element.asClassComment());
                         for (MethodGeneratorContract methodGenerator : BuilderUtil.getMethodGenerators()) {
                             if (methodGenerator.addMethods(clazz, metadata, element, className, isApi)) {
                                 break;
@@ -183,10 +179,10 @@ public class DescriptorBuilder {
         }
     }
 
-    private void addConstructors(final JDefinedClass clazz) {
+    private void addConstructors(final JDefinedClass clazz,final MetadataDescriptor descriptor) {
         final JMethod createChildConstr = clazz.constructor(JMod.PUBLIC);
         createChildConstr.param(JMod.FINAL, String.class, "descriptorName");
-        createChildConstr.body().directStatement("this(descriptorName, new Node(\"application\"));");
+        createChildConstr.body().directStatement("this(descriptorName, new Node(\"" + descriptor.getRootElementName() + "\"));");
 
         final JMethod assignChildConstr = clazz.constructor(JMod.PUBLIC);
         assignChildConstr.param(JMod.FINAL, String.class, "descriptorName");

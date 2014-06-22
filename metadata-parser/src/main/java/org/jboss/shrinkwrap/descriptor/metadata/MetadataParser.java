@@ -164,7 +164,7 @@ public class MetadataParser {
         }
 
         if (path.getPathToApi() != null && path.getPathToImpl() != null) {
-            generateCode(path, verbose, factoryContext);
+//            generateCode(path, verbose, factoryContext);
             PackageInfo.copyPackageInfo(path, metadata, verbose);
             new EnumBuilder().generate(metadata, pathToMetadata, (List<MetadataJavaDoc>) javadocTags, path);
             new ClassBuilder().generate(metadata, pathToMetadata, (List<MetadataJavaDoc>) javadocTags, path);

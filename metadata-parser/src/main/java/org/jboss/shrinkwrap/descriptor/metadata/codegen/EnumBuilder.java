@@ -2,7 +2,6 @@ package org.jboss.shrinkwrap.descriptor.metadata.codegen;
 
 import java.io.File;
 import java.util.List;
-import java.util.logging.Logger;
 
 import org.jboss.shrinkwrap.descriptor.metadata.Metadata;
 import org.jboss.shrinkwrap.descriptor.metadata.MetadataElement;
@@ -18,8 +17,6 @@ import com.sun.codemodel.JMethod;
 import com.sun.codemodel.JMod;
 
 public class EnumBuilder implements MethodGeneratorContract {
-
-    private static final Logger log = Logger.getLogger(EnumBuilder.class.getName());
 
     private static final String[] SEARCH_LIST = new String[] {"DATATYPE", "ELEMENTNAME_P", "ELEMENTNAME_C", "CLASSNAME_P", "ELEMENTNAME_O", "ELEMENTTYPE_P"};
 
@@ -117,7 +114,6 @@ public class EnumBuilder implements MethodGeneratorContract {
                 method.body().directStatement("this.value = value;");
 
                 for (final String value : metadataEnum.getValueList()) {
-                    log.info(value);
                     enumClass.enumConstant("_" + value.replaceAll("\\.", "_").toUpperCase() + "(\"" + value + "\")");
                 }
 

@@ -263,7 +263,7 @@
 						<id>executionJavaEE5</id>
 						<phase>validate</phase>
 						<configuration>
-							<verbose>true</verbose>
+							<verbose>false</verbose>
 							<factoryContext>JavaEE</factoryContext>
 							<javadocs>
 								<javadoc>
@@ -963,7 +963,7 @@
 						<id>executionJavaEE7</id>
 						<phase>validate</phase>
 						<configuration>
-							<verbose>true</verbose>
+							<verbose>false</verbose>
 							<factoryContext>JavaEE</factoryContext>
 							<javadocs>
 								<javadoc>

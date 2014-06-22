@@ -4,6 +4,8 @@ import org.jboss.shrinkwrap.descriptor.metadata.Metadata;
 import org.jboss.shrinkwrap.descriptor.metadata.MetadataElement;
 
 import com.sun.codemodel.JDefinedClass;
+import com.sun.codemodel.JExpr;
+import com.sun.codemodel.JFieldVar;
 
 public class DataTypeBuilder implements MethodGeneratorContract {
 
@@ -197,18 +199,34 @@ public class DataTypeBuilder implements MethodGeneratorContract {
             for (String methodBody : METHOD_LIST_DATATYPE_UNBOUNDED) {
                 clazz.direct(BuilderUtil.replaceAll(methodBody, isApi, SEARCH_LIST, replaceList));
             }
+            final JFieldVar fixedAttribute = BuilderUtil.checkFixedValue(clazz, element, elementName_c, String.class);
+            if (fixedAttribute != null) {
+                fixedAttribute.init(JExpr.lit(element.getFixedValue()));
+            }
         } else {
             if (dataType == Boolean.class) {
                 for (String methodBody : METHOD_LIST_BOOLEAN_SINGLE) {
                     clazz.direct(BuilderUtil.replaceAll(methodBody, isApi, SEARCH_LIST, replaceList));
                 }
+                final JFieldVar fixedAttribute = BuilderUtil.checkFixedValue(clazz, element, elementName_c, Boolean.class);
+                if (fixedAttribute != null) {
+                    fixedAttribute.init(JExpr.lit(Boolean.parseBoolean(element.getFixedValue())));
+                }
             } else if (dataType == Integer.class) {
                 for (String methodBody : METHOD_LIST_INTEGER_SINGLE) {
                     clazz.direct(BuilderUtil.replaceAll(methodBody, isApi, SEARCH_LIST, replaceList));
                 }
+                final JFieldVar fixedAttribute = BuilderUtil.checkFixedValue(clazz, element, elementName_c, Integer.class);
+                if (fixedAttribute != null) {
+                    fixedAttribute.init(JExpr.lit(Integer.parseInt(element.getFixedValue())));
+                }
             } else if (dataType == Long.class) {
                 for (String methodBody : METHOD_LIST_LONG_SINGLE) {
                     clazz.direct(BuilderUtil.replaceAll(methodBody, isApi, SEARCH_LIST, replaceList));
+                }
+                final JFieldVar fixedAttribute = BuilderUtil.checkFixedValue(clazz, element, elementName_c, Long.class);
+                if (fixedAttribute != null) {
+                    fixedAttribute.init(JExpr.lit(Long.parseLong(element.getFixedValue())));
                 }
             } else if (dataType == java.util.Date.class) {
                 for (String methodBody : METHOD_LIST_DATE_SINGLE) {
@@ -217,6 +235,10 @@ public class DataTypeBuilder implements MethodGeneratorContract {
             } else {
                 for (String methodBody : METHOD_LIST_DATATYPE_SINGLE) {
                     clazz.direct(BuilderUtil.replaceAll(methodBody, isApi, SEARCH_LIST, replaceList));
+                }
+                final JFieldVar fixedAttribute = BuilderUtil.checkFixedValue(clazz, element, elementName_c, String.class);
+                if (fixedAttribute != null) {
+                    fixedAttribute.init(JExpr.lit(element.getFixedValue()));
                 }
             }
         }
