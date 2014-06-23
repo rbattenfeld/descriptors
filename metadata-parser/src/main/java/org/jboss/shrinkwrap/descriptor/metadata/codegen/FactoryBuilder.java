@@ -1,11 +1,9 @@
-package org.jboss.shrinkwrap.descriptor.metadata;
+package org.jboss.shrinkwrap.descriptor.metadata.codegen;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
-
-import org.jboss.shrinkwrap.descriptor.metadata.codegen.CodeGen;
 
 import com.sun.codemodel.ClassType;
 import com.sun.codemodel.JClass;
@@ -19,24 +17,26 @@ import com.thoughtworks.qdox.model.JavaAnnotation;
 import com.thoughtworks.qdox.model.JavaClass;
 import com.thoughtworks.qdox.model.JavaSource;
 
-public class MetadataFactoryBuilder {
+public class FactoryBuilder {
 
     public void createFactory(final String pathToApi, final String pathToImpl, final String factoryContext) throws Exception {
         final List<File> fileList = getFiles(pathToApi);
         final List<String> factoryClasses = new ArrayList<String>();
         final JavaProjectBuilder builder = new JavaProjectBuilder();
         for (final File file : fileList) {
-            final JavaSource src = builder.addSource(file);
-            if (src != null) {
-                final JavaClass clazz = src.getClasses().get(0);
-                if (clazz.isPublic()
-                    && !clazz.isEnum()
-                    && !isAnnotated(clazz)
-                    && !clazz.getName().endsWith("Descriptor")
-                    && !clazz.getName().endsWith("Tmp")
-                    && !clazz.getFullyQualifiedName().startsWith("org.jboss.shrinkwrap.descriptor.api.Factory")) {
-                        factoryClasses.add(clazz.getFullyQualifiedName());
-                    }
+            if (file.getName().endsWith(".java")) {
+                final JavaSource src = builder.addSource(file);
+                if (src != null) {
+                    final JavaClass clazz = src.getClasses().get(0);
+                    if (clazz.isPublic()
+                        && !clazz.isEnum()
+                        && !isAnnotated(clazz)
+                        && !clazz.getName().endsWith("Descriptor")
+                        && !clazz.getName().endsWith("Tmp")
+                        && !clazz.getFullyQualifiedName().startsWith("org.jboss.shrinkwrap.descriptor.api.Factory")) {
+                            factoryClasses.add(clazz.getFullyQualifiedName());
+                        }
+                }
             }
         }
 

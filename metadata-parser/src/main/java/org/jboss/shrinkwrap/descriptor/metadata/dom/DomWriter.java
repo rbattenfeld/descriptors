@@ -106,20 +106,22 @@ public class DomWriter {
             final Element generatedElement = doc.createElement("generatedClasses");
             rootElement.appendChild(generatedElement);
             for (final File file : fileList) {
-                final Element generatedClassElement = doc.createElement("generatedClass");
-                generatedClassElement.setAttribute("name", file.getName());
-                generatedElement.appendChild(generatedClassElement);
-                final JavaSource src = builder.addSource(file);
-                final JavaClass class1  = src.getClasses().get(0);
-                generatedClassElement.setAttribute("commonPackage", class1.getPackageName());
-                final List<JavaAnnotation> annotationList = class1.getAnnotations();
-                for (JavaAnnotation annotation : annotationList) {
-                    final  AnnotationValue value = annotation.getProperty("common");
-                    final List<String> commonExtendsList = (List<String>)value.getParameterValue();
-                    for (String commonClass : commonExtendsList) {
-                        final Element extendsElement = doc.createElement("commonExtends");
-                        extendsElement.setAttribute("extends", commonClass.replace('"', ' ').trim());
-                        generatedClassElement.appendChild(extendsElement);
+                if (file.getName().endsWith(".java")) {
+                    final Element generatedClassElement = doc.createElement("generatedClass");
+                    generatedClassElement.setAttribute("name", file.getName());
+                    generatedElement.appendChild(generatedClassElement);
+                    final JavaSource src = builder.addSource(file);
+                    final JavaClass class1  = src.getClasses().get(0);
+                    generatedClassElement.setAttribute("commonPackage", class1.getPackageName());
+                    final List<JavaAnnotation> annotationList = class1.getAnnotations();
+                    for (JavaAnnotation annotation : annotationList) {
+                        final  AnnotationValue value = annotation.getProperty("common");
+                        final List<String> commonExtendsList = (List<String>)value.getParameterValue();
+                        for (String commonClass : commonExtendsList) {
+                            final Element extendsElement = doc.createElement("commonExtends");
+                            extendsElement.setAttribute("extends", commonClass.replace('"', ' ').trim());
+                            generatedClassElement.appendChild(extendsElement);
+                        }
                     }
                 }
             }

@@ -261,16 +261,18 @@ public class BuilderUtil {
 
         final JavaProjectBuilder builder = new JavaProjectBuilder();
         for (final File file : fileList) {
-            final List<String> extendsList = new ArrayList<String>();
-            existingCommonClassMap.put(file.getName(), extendsList);
-            final JavaSource src = builder.addSource(file);
-            final JavaClass class1  = src.getClasses().get(0);
-            final List<JavaAnnotation> annotationList = class1.getAnnotations();
-            for (JavaAnnotation annotation : annotationList) {
-                final  AnnotationValue value = annotation.getProperty("common");
-                final List<String> commonExtendsList = (List<String>)value.getParameterValue();
-                for (String commonClass : commonExtendsList) {
-                    extendsList.add(commonClass.replace('"', ' ').trim());
+            if (file.getName().endsWith(".java")) {
+                final List<String> extendsList = new ArrayList<String>();
+                existingCommonClassMap.put(file.getName(), extendsList);
+                final JavaSource src = builder.addSource(file);
+                final JavaClass class1  = src.getClasses().get(0);
+                final List<JavaAnnotation> annotationList = class1.getAnnotations();
+                for (JavaAnnotation annotation : annotationList) {
+                    final  AnnotationValue value = annotation.getProperty("common");
+                    final List<String> commonExtendsList = (List<String>)value.getParameterValue();
+                    for (String commonClass : commonExtendsList) {
+                        extendsList.add(commonClass.replace('"', ' ').trim());
+                    }
                 }
             }
         }

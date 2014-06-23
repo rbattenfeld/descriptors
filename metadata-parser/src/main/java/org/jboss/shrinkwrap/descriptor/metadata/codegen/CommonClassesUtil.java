@@ -46,16 +46,18 @@ public enum CommonClassesUtil {
 
         final JavaProjectBuilder builder = new JavaProjectBuilder();
         for (final File file : fileList) {
-            final List<String> extendsList = new ArrayList<String>();
-            final JavaSource src = builder.addSource(file);
-            final JavaClass class1  = src.getClasses().get(0);
-            final List<JavaAnnotation> annotationList = class1.getAnnotations();
-            existingCommonClassMap.put(file.getName(), new CommonClassItem(file.getName(), extendsList, class1.getPackageName()));
-            for (JavaAnnotation annotation : annotationList) {
-                final  AnnotationValue value = annotation.getProperty("common");
-                final List<String> commonExtendsList = (List<String>)value.getParameterValue();
-                for (String commonClass : commonExtendsList) {
-                    extendsList.add(commonClass.replace('"', ' ').trim());
+            if (file.getName().endsWith(".java")) {
+                final List<String> extendsList = new ArrayList<String>();
+                final JavaSource src = builder.addSource(file);
+                final JavaClass class1  = src.getClasses().get(0);
+                final List<JavaAnnotation> annotationList = class1.getAnnotations();
+                existingCommonClassMap.put(file.getName(), new CommonClassItem(file.getName(), extendsList, class1.getPackageName()));
+                for (JavaAnnotation annotation : annotationList) {
+                    final  AnnotationValue value = annotation.getProperty("common");
+                    final List<String> commonExtendsList = (List<String>)value.getParameterValue();
+                    for (String commonClass : commonExtendsList) {
+                        extendsList.add(commonClass.replace('"', ' ').trim());
+                    }
                 }
             }
         }
