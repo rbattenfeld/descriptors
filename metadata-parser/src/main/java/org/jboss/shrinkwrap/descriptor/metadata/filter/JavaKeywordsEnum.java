@@ -86,11 +86,9 @@ public enum JavaKeywordsEnum {
     }
 
     public boolean isJavaKeyword(final String ElementName) {
-        // System.out.println("isJavaKeyword: " + ElementName);
         if (ElementName != null) {
             for (XsdDatatypeEnum value : XsdDatatypeEnum.values()) {
                 if (ElementName.equals(value.getDescription())) {
-                    System.out.println("isJavaKeyword: " + ElementName + " found");
                     return true;
                 }
             }

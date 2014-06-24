@@ -33,6 +33,7 @@ import com.thoughtworks.qdox.model.expression.AnnotationValue;
 
 public class BuilderUtil {
     private static Set<String> emtpyBooleanSet = new HashSet<String>();
+    private static Set<String> classArgumentSet = new HashSet<String>();
 
     static {
         emtpyBooleanSet.add("javaee:emptyType");
@@ -62,6 +63,13 @@ public class BuilderUtil {
         emtpyBooleanSet.add("javaee:faces-config-validator-extensionType");
         emtpyBooleanSet.add("javaee:partial-response-extensionType");
         emtpyBooleanSet.add("javaee:extensibleType");
+        classArgumentSet.add("servlet-class");
+        classArgumentSet.add("filter-class");
+        classArgumentSet.add("map-key-class");
+        classArgumentSet.add("target-class");
+        classArgumentSet.add("entity-class");
+        classArgumentSet.add("id-class");
+        classArgumentSet.add("handler-class");
     }
 
     public static JDefinedClass getClass(final JCodeModel jcm, final String fqn, final boolean isApi) throws JClassAlreadyExistsException {
@@ -154,6 +162,10 @@ public class BuilderUtil {
 
     public static boolean isAttribute(final Metadata metadata, final MetadataElement element) {
         return element.getIsAttribute(); // && !isDataType(metadata, element);
+    }
+
+    public static boolean isClassArgument(final String elementName) {
+        return classArgumentSet.contains(elementName);
     }
 
     public static String getDatatypeMappedTo(final Metadata metadata, final MetadataElement element) {

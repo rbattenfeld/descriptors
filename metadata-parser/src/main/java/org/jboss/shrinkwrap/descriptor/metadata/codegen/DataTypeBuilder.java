@@ -140,6 +140,17 @@ public class DataTypeBuilder implements MethodGeneratorContract {
         + "        return null;\n"
         + "    }\n";
 
+    private static final String SET_DATATYPE_AS_CLASS_SINGLE = "\n"
+        + "     /**\n"
+        + "      * Sets the <code>ELEMENTNAME_O</code> element\n"
+        + "      * @param valueClass the value for the element <code>ELEMENTNAME_O</code> \n"
+        + "      * @return the current instance of <code>CLASSNAME_P</code> \n"
+        + "      */\n"
+        + "     public CLASSNAME_P ELEMENTNAME_C(Class<?> value) {\n"
+        + "         getNode().getOrCreate(\"ELEMENTNAME_O\").text(value.getName());\n"
+        + "         return this;\n"
+        + "     }\n";
+
     private static final String[] METHOD_LIST_DATATYPE_UNBOUNDED = new String[] {
         SET_DATATYPE_UNBOUNDED,
         GET_ALL_DATATYPE_UNBOUNDED,
@@ -174,6 +185,10 @@ public class DataTypeBuilder implements MethodGeneratorContract {
         SET_DATATYPE_SINGLE,
         GET_AS_LONG,
         REM_DATATYPE_SINGLE,
+    };
+
+    private static final String[] METHOD_LIST_CLASS_SINGLE = new String[] {
+        SET_DATATYPE_AS_CLASS_SINGLE,
     };
 
     @Override
@@ -239,6 +254,12 @@ public class DataTypeBuilder implements MethodGeneratorContract {
                 final JFieldVar fixedAttribute = BuilderUtil.checkFixedValue(clazz, element, elementName_c, String.class);
                 if (fixedAttribute != null) {
                     fixedAttribute.init(JExpr.lit(element.getFixedValue()));
+                }
+            }
+
+            if (BuilderUtil.isClassArgument(element.getName())) {
+                for (String methodBody : METHOD_LIST_CLASS_SINGLE) {
+                    clazz.direct(BuilderUtil.replaceAll(methodBody, isApi, SEARCH_LIST, replaceList));
                 }
             }
         }

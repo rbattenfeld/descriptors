@@ -48,16 +48,6 @@ public class FactoryBuilder {
     //--Private Methods -----------------------------------------------------||
     //-----------------------------------------------------------------------||
 
-    private String getContext(final String pathToApi) {
-        final Pattern pattern = Pattern.compile("/api-(.*?)/");
-        final java.util.regex.Matcher matcher = pattern.matcher(pathToApi);
-        if (matcher.find()) {
-            return matcher.group(1);
-        } else {
-            return "";
-        }
-    }
-
     private void createFactoryApi(final String pathToApi, final String fullyQualifiedFactoryName, final List<String> factoryClasses) throws Exception {
         final JCodeModel jcm = new JCodeModel();
         final JDefinedClass factoryApiClass = jcm._class(fullyQualifiedFactoryName, ClassType.INTERFACE);
