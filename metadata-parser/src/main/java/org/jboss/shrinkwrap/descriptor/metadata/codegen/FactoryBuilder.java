@@ -3,7 +3,6 @@ package org.jboss.shrinkwrap.descriptor.metadata.codegen;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Pattern;
 
 import com.sun.codemodel.ClassType;
 import com.sun.codemodel.JClass;
@@ -21,6 +20,7 @@ public class FactoryBuilder {
 
     public void createFactory(final String pathToApi, final String pathToImpl, final String factoryContext) throws Exception {
         final List<File> fileList = getFiles(pathToApi);
+        fileList.addAll(getFiles(pathToApi.replace("/main/", "/ext/"))); // hack, I know
         final List<String> factoryClasses = new ArrayList<String>();
         final JavaProjectBuilder builder = new JavaProjectBuilder();
         for (final File file : fileList) {
@@ -53,8 +53,15 @@ public class FactoryBuilder {
         final JDefinedClass factoryApiClass = jcm._class(fullyQualifiedFactoryName, ClassType.INTERFACE);
 
         for (final String factoryClassName : factoryClasses) {
-            final JClass factoryChild = jcm.directClass(factoryClassName);
-            factoryApiClass.method(JMod.PUBLIC, factoryChild, getUniqueNameFromQualifiedName(factoryClassName));
+//            if (factoryClassName.indexOf(".ext.") > 0) {
+//                final String ff = factoryClassName.replace(".ext.", ".");
+//                final String fff = ff.replace("Ext", "");
+//                final JClass factoryChild = jcm.directClass(fff);
+//                factoryApiClass.method(JMod.PUBLIC, factoryChild, getUniqueNameFromQualifiedName(factoryClassName));
+//            } else {
+                final JClass factoryChild = jcm.directClass(factoryClassName);
+                factoryApiClass.method(JMod.PUBLIC, factoryChild, getUniqueNameFromQualifiedName(factoryClassName));
+//            }
         }
 
         final File file = new File(pathToApi);
@@ -71,9 +78,17 @@ public class FactoryBuilder {
         methodInstance.body()._return(JExpr.direct(String.format("new %s()", fullyQualifiedImplFactoryName)));
 
         for (final String factoryClassName : factoryClasses) {
-            final JClass factoryChild = jcm.directClass(factoryClassName);
-            final JMethod method = factoryImplClass.method(JMod.PUBLIC, factoryChild, getUniqueNameFromQualifiedName(factoryClassName));
-            method.body()._return(JExpr.direct(String.format("new %sImpl()", factoryClassName.replace("api", "impl"))));
+//            if (factoryClassName.indexOf(".ext.") > 0) {
+//                final String ff = factoryClassName.replace(".ext.", ".");
+//                final String fff = ff.replace("Ext", "");
+//                final JClass factoryChild = jcm.directClass(fff);
+//                final JMethod method = factoryImplClass.method(JMod.PUBLIC, factoryChild, getUniqueNameFromQualifiedName(factoryClassName));
+//                method.body()._return(JExpr.direct(String.format("new %sImpl()", factoryClassName.replace("api", "impl"))));
+//            } else {
+                final JClass factoryChild = jcm.directClass(factoryClassName);
+                final JMethod method = factoryImplClass.method(JMod.PUBLIC, factoryChild, getUniqueNameFromQualifiedName(factoryClassName));
+                method.body()._return(JExpr.direct(String.format("new %sImpl()", factoryClassName.replace("api", "impl"))));
+//            }
         }
 
         final File file = new File(pathToImpl);

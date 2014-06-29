@@ -98,7 +98,7 @@ public class ClassBuilder {
         assignChildConstr.param(JMod.FINAL, String.class, "nodeName");
         assignChildConstr.param(JMod.FINAL, Node.class, "node");
         assignChildConstr.param(JMod.FINAL, Node.class, "childNode");
-        assignChildConstr.body().directStatement("this.childNode = childNode;");
+        assignChildConstr.body().directStatement("this.childNode = childNode; isDetached = false;");
     }
 
     private void addGetNode(final JDefinedClass clazz) {

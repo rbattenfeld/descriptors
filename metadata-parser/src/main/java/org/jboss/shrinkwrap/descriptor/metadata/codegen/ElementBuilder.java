@@ -24,6 +24,7 @@ public class ElementBuilder implements MethodGeneratorContract {
        + "        if (value instanceof ChildNodeInitializer) {\n"
        + "            if (getNode().getSingle(\"ELEMENTNAME_O\") == null) {\n"
        + "                ((ChildNodeInitializer)value).initialize(\"ELEMENTNAME_O\", getNode());\n"
+       + "                org.jboss.shrinkwrap.descriptor.impl.base.extension.ExtensionProvider.handleSet(this, getNode(), \"ELEMENTNAME_O\", value);\n"
        + "            } else {\n"
        + "                throw new IllegalArgumentException(\"Single child already assigned\");\n"
        + "            }\n"
@@ -38,6 +39,7 @@ public class ElementBuilder implements MethodGeneratorContract {
        + "     */\n"
        + "    public CLASSNAME_P removeELEMENTNAME_P() {\n"
        + "        getNode().removeChildren(\"ELEMENTNAME_O\");\n"
+       + "        org.jboss.shrinkwrap.descriptor.impl.base.extension.ExtensionProvider.handleRemove(this, getNode(), \"ELEMENTNAME_O\");\n"
        + "        return this;\n"
        + "    }\n";
 
@@ -48,6 +50,7 @@ public class ElementBuilder implements MethodGeneratorContract {
        + "     */\n"
        + "    public CLASSNAME_P ELEMENTNAME_C() {\n"
        + "        getNode().getOrCreate(\"ELEMENTNAME_O\");\n"
+       + "        org.jboss.shrinkwrap.descriptor.impl.base.extension.ExtensionProvider.handleSet(this, getNode(), \"ELEMENTNAME_O\", null);\n"
        + "        return this;\n"
        + "    }\n";
 
@@ -72,6 +75,7 @@ public class ElementBuilder implements MethodGeneratorContract {
        + "    public CLASSNAME_P addELEMENTNAME_P(final ELEMENTTYPE_P value) {\n"
        + "        if (value instanceof ChildNodeInitializer) {\n"
        + "           ((ChildNodeInitializer)value).initialize(\"ELEMENTNAME_O\", getNode());\n"
+       + "           org.jboss.shrinkwrap.descriptor.impl.base.extension.ExtensionProvider.handleSet(this, getNode(), \"ELEMENTNAME_O\", value);\n"
        + "        }\n"
        + "        return this;\n"
        + "    }\n";
@@ -83,7 +87,7 @@ public class ElementBuilder implements MethodGeneratorContract {
        + "     */\n"
        + "    public java.util.List<ELEMENTTYPE_P> getAllELEMENTNAME_P() {\n"
        + "        java.util.List<ELEMENTTYPE_P> list = new java.util.ArrayList<ELEMENTTYPE_P>();\n"
-       + "        java.util.List<Node> nodeList = getNode().get(\"ELEMENTNAME_C\");\n"
+       + "        java.util.List<Node> nodeList = getNode().get(\"ELEMENTNAME_O\");\n"
        + "        for (Node node: nodeList) {\n"
        + "            ELEMENTTYPE_P  type = new ELEMENTTYPE_IMPL_PImpl(\"ELEMENTNAME_O\", getNode(), node);\n"
        + "            list.add(type);\n"
@@ -98,6 +102,7 @@ public class ElementBuilder implements MethodGeneratorContract {
        + "     */\n"
        + "    public CLASSNAME_P removeAllELEMENTNAME_P() {\n"
        + "        getNode().removeChildren(\"ELEMENTNAME_O\");\n"
+       + "        org.jboss.shrinkwrap.descriptor.impl.base.extension.ExtensionProvider.handleRemove(this, getNode(), \"ELEMENTNAME_O\");\n"
        + "        return this;\n"
        + "    }\n";
 

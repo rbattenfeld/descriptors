@@ -59,6 +59,7 @@ public class DataTypeBuilder implements MethodGeneratorContract {
         + "      */\n"
         + "     public CLASSNAME_P ELEMENTNAME_C(DATATYPE value) {\n"
         + "         getNode().getOrCreate(\"ELEMENTNAME_O\").text(value);\n"
+        + "         org.jboss.shrinkwrap.descriptor.impl.base.extension.ExtensionProvider.handleSet(this, getNode(), \"ELEMENTNAME_O\", value);\n"
         + "         return this;\n"
         + "     }\n";
 
