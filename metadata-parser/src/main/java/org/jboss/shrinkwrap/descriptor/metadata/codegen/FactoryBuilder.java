@@ -56,7 +56,6 @@ public class FactoryBuilder {
     private void createFactoryApi(final String pathToApi, final String fullyQualifiedFactoryName, final List<String> factoryClasses) throws Exception {
         final JCodeModel jcm = new JCodeModel();
         final JDefinedClass factoryApiClass = jcm._class(fullyQualifiedFactoryName, ClassType.INTERFACE);
-
         final List<String> methodNames = new LinkedList<String>();
         for (final String factoryClassName : factoryClasses) {
 //            if (factoryClassName.indexOf(".ext.") > 0) {
