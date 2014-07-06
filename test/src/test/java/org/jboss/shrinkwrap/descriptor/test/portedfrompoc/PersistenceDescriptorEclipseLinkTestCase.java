@@ -61,7 +61,7 @@ public class PersistenceDescriptorEclipseLinkTestCase {
     }
 
     private PersistenceDescriptor create() {
-        return Descriptors.create(PersistenceDescriptor.class).addPersistenceUnit(FactoryJavaEEImpl.instance().persistenceUnitPersistence20()
+        return Descriptors.create(PersistenceDescriptor.class).addPersistenceUnit(FactoryJavaEEImpl.instance().persistenceUnit20()
             .name(this.getClass().getSimpleName()));
     }
 

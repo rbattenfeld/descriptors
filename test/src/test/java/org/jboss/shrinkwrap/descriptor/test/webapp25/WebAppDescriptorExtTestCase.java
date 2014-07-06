@@ -16,10 +16,10 @@ public class WebAppDescriptorExtTestCase {
     @Test
     public void testFilterTypeExt() throws Exception {
     	final WebAppDescriptor webAppDescr = create();
-    	webAppDescr.factory().filterTypeExtWebapp25().filter("myFilterName", "com.myfilter.filter", new String[] {"url1", "url2"});
+    	webAppDescr.factory().filterTypeExt25().filter("myFilterName", "com.myfilter.filter", new String[] {"url1", "url2"});
     	webAppDescr.addFilter(webAppDescr
     			.factory()
-    			.filterTypeExtWebapp25()
+    			.filterTypeExt25()
     			.filter("myFilterName", "com.myfilter.filter", new String[] {"url1", "url2"}));
     	
 //    	log.info("web.xml after update: " + webAppDescr.exportAsString());

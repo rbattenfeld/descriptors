@@ -82,7 +82,7 @@ public class PersistenceDescriptorTestCase {
 
     @Test
     public void shouldBeAbleToAddMultiplePersistenceUnits() throws Exception {
-        String desc = create().addPersistenceUnit(FactoryJavaEEImpl.instance().persistenceUnitPersistence20().name(name2)).exportAsString();
+        String desc = create().addPersistenceUnit(FactoryJavaEEImpl.instance().persistenceUnit20().name(name2)).exportAsString();
 
         assertPresenceUsingXPath(desc, "/persistence/persistence-unit/@name", name, name2);
     }
@@ -99,14 +99,14 @@ public class PersistenceDescriptorTestCase {
     public void shouldOnlyCreateOnePersistenceUnitWithSameName() throws Exception {
         // create() creates a persistenceUnit with "name".
         // Add a new persistence unit with "name", should return the same node. name is defined unique
-        String desc = create().addPersistenceUnit(FactoryJavaEEImpl.instance().persistenceUnitPersistence20().name(name)).exportAsString();
+        String desc = create().addPersistenceUnit(FactoryJavaEEImpl.instance().persistenceUnit20().name(name)).exportAsString();
 
         assertPresenceUsingXPath(desc, "/persistence/persistence-unit/@name", name);
     }
 
     @Test
     public void shouldBeAbleToAddClasses() throws Exception {
-        String desc = create().addPersistenceUnit(FactoryJavaEEImpl.instance().persistenceUnitPersistence20()
+        String desc = create().addPersistenceUnit(FactoryJavaEEImpl.instance().persistenceUnit20()
             .clazz(PersistenceDescriptor.class.getName(), PersistenceDescriptor.class.getName())).exportAsString();
 
         assertPresenceUsingXPath(desc, "/persistence/persistence-unit/class", PersistenceDescriptor.class.getName(),
@@ -123,14 +123,14 @@ public class PersistenceDescriptorTestCase {
 
     @Test
     public void shouldBeAbleToSetExcludeUnlistedClasses() throws Exception {
-        String desc = create().addPersistenceUnit(FactoryJavaEEImpl.instance().persistenceUnitPersistence20().excludeUnlistedClasses(true)).exportAsString();
+        String desc = create().addPersistenceUnit(FactoryJavaEEImpl.instance().persistenceUnit20().excludeUnlistedClasses(true)).exportAsString();
 
         assertPresenceUsingXPath(desc, "/persistence/persistence-unit/exclude-unlisted-classes", "true");
     }
 
     @Test
     public void shouldBeAbleToSetIncludeUnlistedClasses() throws Exception {
-        String desc = create().addPersistenceUnit(FactoryJavaEEImpl.instance().persistenceUnitPersistence20().excludeUnlistedClasses(false)).exportAsString();
+        String desc = create().addPersistenceUnit(FactoryJavaEEImpl.instance().persistenceUnit20().excludeUnlistedClasses(false)).exportAsString();
 
         assertPresenceUsingXPath(desc, "/persistence/persistence-unit/exclude-unlisted-classes", "false");
     }
@@ -157,7 +157,7 @@ public class PersistenceDescriptorTestCase {
     @Test
     @Ignore("Missing in the new API")
     public void shouldBeAbleToReplaceNonJTADataSourceWithJTADataSource() throws Exception {
-        String desc = create().addPersistenceUnit(FactoryJavaEEImpl.instance().persistenceUnitPersistence20().nonJtaDataSource(name2).jtaDataSource(name))
+        String desc = create().addPersistenceUnit(FactoryJavaEEImpl.instance().persistenceUnit20().nonJtaDataSource(name2).jtaDataSource(name))
             .exportAsString();
 
         assertPresenceUsingXPath(desc, "/persistence/persistence-unit/jta-data-source", name);
@@ -175,35 +175,35 @@ public class PersistenceDescriptorTestCase {
 
     @Test
     public void shouldBeAbleToSetJarFile() throws Exception {
-        String desc = create().addPersistenceUnit(FactoryJavaEEImpl.instance().persistenceUnitPersistence20().jarFile(name)).exportAsString();
+        String desc = create().addPersistenceUnit(FactoryJavaEEImpl.instance().persistenceUnit20().jarFile(name)).exportAsString();
 
         assertPresenceUsingXPath(desc, "/persistence/persistence-unit/jar-file", name);
     }
 
     @Test
     public void shouldBeAbleToSetJarFiles() throws Exception {
-        String desc = create().addPersistenceUnit(FactoryJavaEEImpl.instance().persistenceUnitPersistence20().jarFile(name, name2)).exportAsString();
+        String desc = create().addPersistenceUnit(FactoryJavaEEImpl.instance().persistenceUnit20().jarFile(name, name2)).exportAsString();
 
         assertPresenceUsingXPath(desc, "/persistence/persistence-unit/jar-file", name, name2);
     }
 
     @Test
     public void shouldBeAbleToSetMappingFile() throws Exception {
-        String desc = create().addPersistenceUnit(FactoryJavaEEImpl.instance().persistenceUnitPersistence20().mappingFile(name)).exportAsString();
+        String desc = create().addPersistenceUnit(FactoryJavaEEImpl.instance().persistenceUnit20().mappingFile(name)).exportAsString();
 
         assertPresenceUsingXPath(desc, "/persistence/persistence-unit/mapping-file", name);
     }
 
     @Test
     public void shouldBeAbleToSetMappingFiles() throws Exception {
-        String desc = create().addPersistenceUnit(FactoryJavaEEImpl.instance().persistenceUnitPersistence20().mappingFile(name, name2)).exportAsString();
+        String desc = create().addPersistenceUnit(FactoryJavaEEImpl.instance().persistenceUnit20().mappingFile(name, name2)).exportAsString();
 
         assertPresenceUsingXPath(desc, "/persistence/persistence-unit/mapping-file", name, name2);
     }
 
     @Test
     public void shouldBeAbleToSetTransactionType() throws Exception {
-        String desc = create().addPersistenceUnit(FactoryJavaEEImpl.instance().persistenceUnitPersistence20().transactionType(PersistenceUnitTransactionType._JTA))
+        String desc = create().addPersistenceUnit(FactoryJavaEEImpl.instance().persistenceUnit20().transactionType(PersistenceUnitTransactionType._JTA))
             .exportAsString();
 
         assertPresenceUsingXPath(desc, "/persistence/persistence-unit/@transaction-type",
@@ -380,6 +380,6 @@ public class PersistenceDescriptorTestCase {
     // -------------------------------------------------------------------------------------||
 
     private PersistenceDescriptor create() {
-        return Descriptors.create(PersistenceDescriptor.class).addPersistenceUnit(FactoryJavaEEImpl.instance().persistenceUnitPersistence20().name(name));
+        return Descriptors.create(PersistenceDescriptor.class).addPersistenceUnit(FactoryJavaEEImpl.instance().persistenceUnit20().name(name));
     }
 }

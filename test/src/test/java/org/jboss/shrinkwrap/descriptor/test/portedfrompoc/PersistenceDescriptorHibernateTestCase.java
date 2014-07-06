@@ -17,7 +17,7 @@ public class PersistenceDescriptorHibernateTestCase {
 
     @Test
     public void shouldBeAbleSetProviderHibernate() throws Exception {
-        String desc = create().addPersistenceUnit(FactoryJavaEEImpl.instance().persistenceUnitPersistence20().provider("HIBERNATE")).exportAsString();
+        String desc = create().addPersistenceUnit(FactoryJavaEEImpl.instance().persistenceUnit20().provider("HIBERNATE")).exportAsString();
 
         assertPresenceUsingXPath(desc, "/persistence/persistence-unit/provider", "HIBERNATE");
     }
@@ -94,7 +94,7 @@ public class PersistenceDescriptorHibernateTestCase {
     // }
     //
     private PersistenceDescriptor create() {
-        return Descriptors.create(PersistenceDescriptor.class).addPersistenceUnit(FactoryJavaEEImpl.instance().persistenceUnitPersistence20()
+        return Descriptors.create(PersistenceDescriptor.class).addPersistenceUnit(FactoryJavaEEImpl.instance().persistenceUnit20()
             .name(this.getClass().getSimpleName()));
     }
 }
