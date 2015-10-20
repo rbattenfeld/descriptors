@@ -19,10 +19,12 @@ package org.jboss.shrinkwrap.descriptor.test.jbossmodule13;
 import java.io.BufferedReader;
 import java.io.FileReader;
 
+import org.jboss.shrinkwrap.descriptor.api.Descriptor;
 import org.jboss.shrinkwrap.descriptor.api.Descriptors;
 import org.jboss.shrinkwrap.descriptor.api.jbossmodule13.ModuleAbsentDescriptor;
 import org.jboss.shrinkwrap.descriptor.api.jbossmodule13.ModuleAliasDescriptor;
 import org.jboss.shrinkwrap.descriptor.api.jbossmodule13.ModuleDescriptor;
+import org.jboss.shrinkwrap.descriptor.api.jbossmodule13.WrapperModuleDescriptor;
 import org.jboss.shrinkwrap.descriptor.test.util.XmlAssert;
 import org.junit.Test;
 
@@ -101,6 +103,58 @@ public class ModuleTestCase {
             builder.append("\n");
         }
         return builder.toString();
+    }
+        
+    public class WrapperModuleDescriptorImpl implements WrapperModuleDescriptor {
+    	private final WrapperModuleDescriptor descriptor;
+    	
+    	private WrapperModuleDescriptorImpl(final WrapperModuleDescriptor descriptor) {
+    		this.descriptor = descriptor;
+    	}
+    	
+    	public static WrapperModuleDescriptor fromString(final String fileContent) {
+    		if (fileContent.indexOf("<module-absent") >= 0) {
+    			return new WrapperModuleDescriptorImpl((WrapperModuleDescriptor) Descriptors.importAs(ModuleAbsentDescriptor.class).fromString(fileContent));
+    		} else if (fileContent.indexOf("<module-alias") >= 0) {
+    			return new WrapperModuleDescriptorImpl((WrapperModuleDescriptor) Descriptors.importAs(ModuleAliasDescriptor.class).fromString(fileContent));
+    		} else if (fileContent.indexOf("<module") >= 0) {
+    			return new WrapperModuleDescriptorImpl((WrapperModuleDescriptor) Descriptors.importAs(ModuleDescriptor.class).fromString(fileContent));
+    		} else {
+    			throw new IllegalArgumentException("Wrong content");
+    		}
+    	}
+
+		@Override
+		public WrapperModuleDescriptor slot(String slot) {
+			return descriptor.slot(slot);
+		}
+
+		@Override
+		public String getSlot() {
+			return descriptor.getSlot();
+		}
+
+		@Override
+		public WrapperModuleDescriptor removeSlot() {
+			return descriptor.removeSlot();
+		}
+
+		@Override
+		public WrapperModuleDescriptor name(String name) {
+			return descriptor.name(name);
+		}
+
+		@Override
+		public String getName() {
+			return descriptor.getName();
+		}
+
+		@Override
+		public WrapperModuleDescriptor removeName() {
+			return descriptor.removeName();
+		}
+    	
+    	
     }
 
 }

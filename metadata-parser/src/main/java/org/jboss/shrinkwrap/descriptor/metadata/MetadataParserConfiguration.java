@@ -101,6 +101,11 @@ public class MetadataParserConfiguration {
     protected MetadataParserCommonRef commonRef;
 
     /**
+     * Optional wrapper descriptor settings for descriptors with multi root elements.
+     */
+    protected MetadataParserWrapperDescriptorElement wrapperDescriptorElement;
+
+    /**
      * The map declaring the name spaces for the given descriptor.
      */
     protected Properties namespaces = new Properties();
@@ -231,5 +236,14 @@ public class MetadataParserConfiguration {
 
     public void setCommonImports(String[] imports) {
         this.commonImports = imports;
+    }
+
+    public MetadataParserWrapperDescriptorElement getWrapperDescriptorElement() {
+        return wrapperDescriptorElement;
+    }
+
+    public void setWrapperDescriptorElement(
+            MetadataParserWrapperDescriptorElement wrapperDescriptorElement) {
+        this.wrapperDescriptorElement = wrapperDescriptorElement;
     }
 }

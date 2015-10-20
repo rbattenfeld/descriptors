@@ -45,6 +45,8 @@ public class MetadataDescriptor extends BaseMetadataItem {
 
     protected MetadataParserCommonRef commonRef;
 
+    protected MetadataParserWrapperDescriptorElement wrapperDescriptorElement;
+
     public MetadataDescriptor(String name) {
         super(name);
     }
@@ -129,4 +131,12 @@ public class MetadataDescriptor extends BaseMetadataItem {
         this.generateCommonClasses = generateCommonClasses;
     }
 
+    public MetadataParserWrapperDescriptorElement getWrapperDescriptorElement() {
+        return wrapperDescriptorElement;
+    }
+
+    public void setWrapperDescriptorElement(
+            MetadataParserWrapperDescriptorElement wrapperDescriptorElement) {
+        this.wrapperDescriptorElement = wrapperDescriptorElement;
+    }
 }

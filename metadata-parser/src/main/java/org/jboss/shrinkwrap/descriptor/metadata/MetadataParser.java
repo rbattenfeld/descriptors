@@ -110,6 +110,7 @@ public class MetadataParser {
             metadataDescriptor.setCommonRef(metadataConf.getCommonRef());
             metadataDescriptor.setGenerateCommonClasses(metadataConf.generateCommonClasses);
             metadataDescriptor.setCommonImports(metadataConf.getCommonImports());
+            metadataDescriptor.setWrapperDescriptorElement(metadataConf.getWrapperDescriptorElement());
 
             metadata.getMetadataDescriptorList().add(metadataDescriptor);
 

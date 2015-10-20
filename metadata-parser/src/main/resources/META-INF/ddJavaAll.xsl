@@ -61,6 +61,8 @@
         <xsl:call-template name="GenerateCommonInterfaces"/>
         <xsl:call-template name="GenerateInterfaces"/>
         <xsl:call-template name="GenerateCommonDescriptors"/>
+        <xsl:call-template name="GenerateWrapperDescriptors"/>
+        <xsl:call-template name="GenerateWrapperDescriptorsImpl"/>
         <xsl:call-template name="GenerateDescriptors"/>
         <xsl:call-template name="GenerateDescriptorsImpl"/>
         <xsl:call-template name="GenerateImplClasses"/>
@@ -674,7 +676,142 @@
         </xsl:for-each>        
     </xsl:template>
     
-
+    <!-- ****************************************************************************** -->
+    <!-- ****** Template which generates the wrapper descriptor interfaces        ***** -->
+    <!-- ****************************************************************************** -->
+    <xsl:template name="GenerateWrapperDescriptors">        
+        <xsl:for-each select="//descriptors/descriptor/wrapperDescriptorElement[@wrapperDescriptorName != '']">
+            <xsl:variable name="vPath" select="../@packageApi"/>
+            <xsl:variable name="vCommonDescrName" select="./@wrapperDescriptorName"/>
+            
+            <xsl:variable name="vFilename" select="xdd:createPath($gOutputFolderApi, $vPath, $vCommonDescrName, 'java')"/>
+            <xsl:result-document href="{$vFilename}">
+                <xsl:if test="$gVerbose">
+                    <xsl:message select=" concat('Generating wrapper descriptor: ', $vFilename)"/> 
+                </xsl:if>
+                <xsl:value-of select="xdd:writeCopyright()"/>                
+                <xsl:value-of select="xdd:writePackageLine(../@packageApi)"/>
+                <xsl:value-of select="concat('import java.util.List;', '&#10;')"/>
+                <xsl:value-of select="concat('import org.jboss.shrinkwrap.descriptor.api.Descriptor;', '&#10;&#10;')"/>
+                <xsl:value-of select="concat('','&#10;')"/>                
+                <xsl:value-of select="xdd:classHeaderDeclaration('interface', $vCommonDescrName)"/>                
+                <xsl:value-of select="concat('&lt;T&gt;', ' {', '&#10;')"/>  
+                
+                <xsl:for-each select="types/type">
+                    <xsl:variable name="vMaxOccurs" select="concat('-',  @maxOccurs)"/>
+                    <xsl:value-of select="xdd:writeMethodOrAttribute('T', @name, @type, $vMaxOccurs, false(), true(), false(), '', exists(@attribute), xdd:checkEmptySequence(@default), xdd:checkEmptySequence(@fixed), xdd:checkEmptySequence(@use))"/>
+                </xsl:for-each>
+                <xsl:text>}&#10;</xsl:text>
+            </xsl:result-document>        
+        </xsl:for-each>        
+    </xsl:template>
+    
+    <!-- ****************************************************************************** -->
+    <!-- ****** Template which generates the wrapper descriptor Impl interfaces   ***** -->
+    <!-- ****************************************************************************** -->
+    <xsl:template name="GenerateWrapperDescriptorsImpl">        
+        <xsl:for-each select="//descriptors/descriptor/wrapperDescriptorElement[@wrapperDescriptorName != '']">
+            <xsl:variable name="vPathApi" select="../@packageApi"/>
+            <xsl:variable name="vPath" select="../@packageImpl"/>
+            <xsl:variable name="vCommonDescrName" select="./@wrapperDescriptorName"/>
+            <xsl:variable name="vClassnameImpl" select="concat($vCommonDescrName, 'Impl')"/>
+            
+            <xsl:variable name="vFilename" select="xdd:createPath($gOutputFolder, $vPath, $vClassnameImpl, 'java')"/>
+            <xsl:result-document href="{$vFilename}">
+                <xsl:if test="$gVerbose">
+                    <xsl:message select=" concat('Generating wrapper descriptor: ', $vFilename)"/> 
+                </xsl:if>
+                <xsl:value-of select="xdd:writeCopyright()"/>                
+                <xsl:value-of select="xdd:writePackageLine($vPath)"/>
+                <xsl:value-of select="concat('import org.jboss.shrinkwrap.descriptor.api.Descriptors;', '&#10;&#10;')"/>
+                <xsl:value-of select="concat('import ', ../@packageApi, '.', xdd:createPascalizedName($vCommonDescrName,''), ';&#10;')"/>                
+                <xsl:value-of select="concat('import java.io.File;', '&#10;')"/>
+                <xsl:value-of select="concat('import java.io.FileInputStream;', '&#10;')"/>
+                <xsl:value-of select="concat('import java.io.FileNotFoundException;', '&#10;')"/>
+                <xsl:value-of select="concat('import org.jboss.shrinkwrap.descriptor.spi.node.Node;', '&#10;')"/>
+                <xsl:value-of select="concat('import org.jboss.shrinkwrap.descriptor.spi.node.NodeImporter;', '&#10;')"/>
+                <xsl:value-of select="concat('import org.jboss.shrinkwrap.descriptor.spi.node.dom.XmlDomNodeImporterImpl;', '&#10;')"/>              
+                
+                <xsl:for-each select="wrappedDescriptors/wrappedDescriptor">
+                    <xsl:value-of select="concat('import ', $vPathApi, '.', xdd:createPascalizedName(@name,''), ';&#10;')"/>
+                </xsl:for-each>
+                
+                <xsl:value-of select="concat('','&#10;')"/>                
+                <xsl:value-of select="xdd:classHeaderDeclaration('class', $vClassnameImpl)"/>                
+                <xsl:value-of select="concat(' {', '&#10;')"/>
+               
+                <xsl:call-template name="writeImportFromString">
+                    <xsl:with-param name="pWrapperDescriptorElement" select="."/>
+                    <xsl:with-param name="pCommonDescrName" select="$vCommonDescrName"/>
+                    <xsl:with-param name="pType" select="'String'"/>
+                    <xsl:with-param name="pMethodName" select="'fromString'"/>
+                </xsl:call-template>               
+               
+                <xsl:call-template name="writeImportFromFile">
+                    <xsl:with-param name="pWrapperDescriptorElement" select="."/>
+                    <xsl:with-param name="pCommonDescrName" select="$vCommonDescrName"/>
+                    <xsl:with-param name="pType" select="'File'"/>
+                    <xsl:with-param name="pMethodName" select="'fromFile'"/>
+                </xsl:call-template>
+              
+                <xsl:text>}&#10;</xsl:text>
+            </xsl:result-document>        
+        </xsl:for-each>        
+    </xsl:template>
+    
+    <!-- ****************************************************** -->
+    <!-- ****** Template which write generic extends      ***** -->
+    <!-- ****************************************************** -->
+    <xsl:template name="writeImportFromString">
+        <xsl:param name="pWrapperDescriptorElement" select="."/>
+        <xsl:param name="pCommonDescrName" as="xs:string"/> 
+        <xsl:param name="pType" as="xs:string"/> 
+        <xsl:param name="pMethodName" as="xs:string"/>        
+        <xsl:value-of select="concat('', '&#10;')"/>
+        <xsl:value-of select="concat('    ', 'public static ', $pCommonDescrName, '&lt;?&gt; ', $pMethodName, '(final ', $pType, ' arg)', ' {', '&#10;')"/>
+        
+        <xsl:value-of select="concat('        ', 'if (arg == null) {', '&#10;')"/>
+        <xsl:value-of select="concat('        ', '    throw new IllegalArgumentException(', '&quot;', 'Wrong content', '&quot;', ');', '&#10;')"/>
+        <xsl:value-of select="concat('        ', '}', '&#10;')"/>
+        
+        <xsl:for-each select="$pWrapperDescriptorElement/wrappedDescriptors/wrappedDescriptor">
+            <xsl:variable name="filterPattern" select="concat('&lt;', @filter-criteria)"/>
+            <xsl:value-of select="concat('        ', 'if (arg.indexOf(', '&quot;', $filterPattern, '&quot;', ') >= 0) {', '&#10;')"/>
+            <xsl:value-of select="concat('        ', '    return (', $pCommonDescrName, '&lt;?&gt;)', 'Descriptors.importAs(', @name, '.class', ').', $pMethodName, '(arg);', '&#10;')"/>
+            <xsl:value-of select="concat('        ', '}', '&#10;')"/>
+        </xsl:for-each>
+        <xsl:value-of select="concat('    ', '    throw new IllegalArgumentException(', '&quot;', 'Wrong content', '&quot;', ');', '&#10;')"/>
+        <xsl:value-of select="concat('    ', '}', '&#10;')"/>
+    </xsl:template>
+    
+    <!-- ****************************************************** -->
+    <!-- ****** Template which write generic extends      ***** -->
+    <!-- ****************************************************** -->
+    <xsl:template name="writeImportFromFile">
+        <xsl:param name="pWrapperDescriptorElement" select="."/>
+        <xsl:param name="pCommonDescrName" as="xs:string"/> 
+        <xsl:param name="pType" as="xs:string"/> 
+        <xsl:param name="pMethodName" as="xs:string"/>        
+        <xsl:value-of select="concat('', '&#10;')"/>
+        <xsl:value-of select="concat('    ', 'public static ', $pCommonDescrName, '&lt;?&gt; ', $pMethodName, '(final ', $pType, ' file)', ' throws IllegalArgumentException, FileNotFoundException {', '&#10;')"/>
+        
+        <xsl:value-of select="concat('        ', 'if (file == null) {', '&#10;')"/>
+        <xsl:value-of select="concat('        ', '    throw new IllegalArgumentException(', '&quot;', 'Wrong content', '&quot;', ');', '&#10;')"/>
+        <xsl:value-of select="concat('        ', '}', '&#10;')"/>        
+        <xsl:value-of select="concat('        ', 'final NodeImporter importer = new XmlDomNodeImporterImpl();', '&#10;')"/>
+        <xsl:value-of select="concat('        ', 'final Node node = importer.importAsNode(new FileInputStream(file), true);', '&#10;')"/>        
+        <xsl:value-of select="concat('        ', 'final String rootName = node.getName();', '&#10;')"/>
+        
+        <xsl:for-each select="$pWrapperDescriptorElement/wrappedDescriptors/wrappedDescriptor">
+            <xsl:variable name="filterPattern" select="concat('&lt;', @filter-criteria)"/>
+            <xsl:value-of select="concat('        ', 'if (rootName.equals(', '&quot;', $filterPattern, '&quot;', ')) {', '&#10;')"/>
+            <xsl:value-of select="concat('        ', '    return (', $pCommonDescrName, '&lt;?&gt;)', 'Descriptors.importAs(', @name, '.class', ').', $pMethodName, '(file);', '&#10;')"/>
+            <xsl:value-of select="concat('        ', '}', '&#10;')"/>
+        </xsl:for-each>
+        <xsl:value-of select="concat('    ', '    throw new IllegalArgumentException(', '&quot;', 'Wrong content', '&quot;', ');', '&#10;')"/>
+        <xsl:value-of select="concat('    ', '}', '&#10;')"/>
+    </xsl:template>
+    
     <!-- ****************************************************** -->
     <!-- ****** Template which generates the test classes  **** -->
     <!-- ****************************************************** -->
@@ -715,7 +852,7 @@
         <xsl:variable name="vClassname" select="@name"/>
         <xsl:variable name="vCommonPackage" select="xdd:getCommonPackage($vPackage)"/>
         <xsl:if test="$gVerbose">
-            <xsl:message select="concat('Generating Descriptor Api: ', $vClassname)"/>
+            <xsl:message select="concat('Generating Descriptor Api: ', $vClassname, ' ', $vPackage)"/>
         </xsl:if>
         <xsl:if test="$vClassname">
             <xsl:variable name="vFilename" select="xdd:createPath($gOutputFolderApi, $vPackage, $vClassname, 'java')"/>
@@ -747,6 +884,17 @@
                     </xsl:for-each>
                     <xsl:value-of select="'&gt;'"/>
                 </xsl:if>
+                
+                <xsl:if test="exists(wrapperDescriptorElement[@wrapperDescriptorName != ''])">
+                    <xsl:value-of select="concat(', ', wrapperDescriptorElement/@wrapperDescriptorName), '&lt;', $vClassname, '&gt;'"/>
+                </xsl:if>
+                
+                <xsl:if test="exists(wrapperDescriptorElement[@ref != ''])">
+                    <xsl:variable name="vWwrapperRef" select="wrapperDescriptorElement/@ref"/>
+<!--                    <xsl:variable name="vWwrapperName" select="//descriptors/descriptor/wrapperDescriptorElement[@id = $vWwrapperRef]/@wrapperDescriptorName"/>-->
+                    <xsl:value-of select="concat(', ', $vWwrapperRef, '&lt;', $vClassname, '&gt;')"/>
+                </xsl:if>
+                
                 <xsl:value-of select="concat(' {', '&#10;&#10;')"/>                
                 <xsl:variable name="vType" select=" substring-after($pDescriptor/element/@type, ':')"/>
                 <xsl:variable name="vNamespace" select=" substring-before($pDescriptor/element/@type, ':')"/>                   

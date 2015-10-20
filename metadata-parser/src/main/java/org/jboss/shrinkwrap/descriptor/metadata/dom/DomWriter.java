@@ -42,6 +42,7 @@ import org.jboss.shrinkwrap.descriptor.metadata.MetadataElement;
 import org.jboss.shrinkwrap.descriptor.metadata.MetadataEnum;
 import org.jboss.shrinkwrap.descriptor.metadata.MetadataItem;
 import org.jboss.shrinkwrap.descriptor.metadata.MetadataJavaDoc;
+import org.jboss.shrinkwrap.descriptor.metadata.MetadataParserWrapperDescriptorElement;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -552,6 +553,50 @@ public class DomWriter {
                         }
 
                         descriptorElement.appendChild(commonElement);
+                    }
+
+                    if (descriptor.getWrapperDescriptorElement() != null) {
+                        final MetadataParserWrapperDescriptorElement wrapperDescriptor = descriptor.getWrapperDescriptorElement();
+                        final Element wrapperDescriptorElement = doc.createElement("wrapperDescriptorElement");
+                        descriptorElement.appendChild(wrapperDescriptorElement);
+
+                        if (wrapperDescriptor.getId() != null) {
+                            wrapperDescriptorElement.setAttribute("id", wrapperDescriptor.getId());
+                            wrapperDescriptorElement.setAttribute("wrapperDescriptorName", wrapperDescriptor.getWrapperDescriptorName());
+                        }
+
+                        if (wrapperDescriptor.getRef() != null) {
+                            wrapperDescriptorElement.setAttribute("ref", wrapperDescriptor.getRef());
+                        }
+
+                        if (wrapperDescriptor.getTypes() != null) {
+                            final Element wrapperTypes = doc.createElement("types");
+                            for (String type : wrapperDescriptor.getTypes()) {
+                                final Element typeElement = doc.createElement("type");
+                                final String[] items = type.split(":", -1);
+                                if (items.length == 3) {
+                                    typeElement.setAttribute("namespace", items[0]);
+                                    typeElement.setAttribute("type", items[1]);
+                                    typeElement.setAttribute("name", items[2]);
+                                    wrapperTypes.appendChild(typeElement);
+                                }
+                            }
+                            wrapperDescriptorElement.appendChild(wrapperTypes);
+                        }
+
+                        if (wrapperDescriptor.getDescriptors() != null) {
+                            final Element wrappedDescriptors = doc.createElement("wrappedDescriptors");
+                            for (String type : wrapperDescriptor.getDescriptors()) {
+                                final Element typeElement = doc.createElement("wrappedDescriptor");
+                                final String[] items = type.split(":", -1);
+                                if (items.length == 2) {
+                                    typeElement.setAttribute("name", items[0]);
+                                    typeElement.setAttribute("filter-criteria", items[1]);
+                                    wrappedDescriptors.appendChild(typeElement);
+                                }
+                            }
+                            wrapperDescriptorElement.appendChild(wrappedDescriptors);
+                        }
                     }
                 }
             }
