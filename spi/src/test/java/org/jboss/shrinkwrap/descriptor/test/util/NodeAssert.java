@@ -18,7 +18,7 @@ package org.jboss.shrinkwrap.descriptor.test.util;
 
 import java.util.Arrays;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 import org.jboss.shrinkwrap.descriptor.spi.node.Node;
 

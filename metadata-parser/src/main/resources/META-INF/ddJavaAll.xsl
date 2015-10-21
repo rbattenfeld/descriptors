@@ -803,7 +803,7 @@
         <xsl:value-of select="concat('        ', 'final String rootName = node.getName();', '&#10;')"/>
         
         <xsl:for-each select="$pWrapperDescriptorElement/wrappedDescriptors/wrappedDescriptor">
-            <xsl:variable name="filterPattern" select="concat('&lt;', @filter-criteria)"/>
+            <xsl:variable name="filterPattern" select="concat('', @filter-criteria)"/>
             <xsl:value-of select="concat('        ', 'if (rootName.equals(', '&quot;', $filterPattern, '&quot;', ')) {', '&#10;')"/>
             <xsl:value-of select="concat('        ', '    return (', $pCommonDescrName, '&lt;?&gt;)', 'Descriptors.importAs(', @name, '.class', ').', $pMethodName, '(file);', '&#10;')"/>
             <xsl:value-of select="concat('        ', '}', '&#10;')"/>

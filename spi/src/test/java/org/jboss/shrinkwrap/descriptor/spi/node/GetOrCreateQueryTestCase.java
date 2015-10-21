@@ -27,7 +27,7 @@ import static org.jboss.shrinkwrap.descriptor.test.util.TestTreeBuilder.ROOT_NOD
 
 import java.util.List;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 import org.junit.Test;
 

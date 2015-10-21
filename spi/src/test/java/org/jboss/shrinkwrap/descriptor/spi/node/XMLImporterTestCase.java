@@ -18,7 +18,7 @@ package org.jboss.shrinkwrap.descriptor.spi.node;
 
 import java.io.ByteArrayInputStream;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 import org.jboss.shrinkwrap.descriptor.spi.node.dom.XmlDomNodeImporter;
 import org.junit.Test;

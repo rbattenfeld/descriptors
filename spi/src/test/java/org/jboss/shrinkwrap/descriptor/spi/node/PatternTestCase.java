@@ -18,7 +18,7 @@ package org.jboss.shrinkwrap.descriptor.spi.node;
 
 import java.util.logging.Logger;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 import org.jboss.shrinkwrap.descriptor.spi.node.Node;
 import org.jboss.shrinkwrap.descriptor.spi.node.Pattern;

@@ -16,7 +16,7 @@
  */
 package org.jboss.shrinkwrap.descriptor.impl.common;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 import org.jboss.shrinkwrap.descriptor.api.Descriptor;
 import org.jboss.shrinkwrap.descriptor.api.Descriptors;
